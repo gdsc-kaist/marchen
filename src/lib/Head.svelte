@@ -1,0 +1,32 @@
+<script lang="ts">
+    import {pageScroll} from "$stores/ui";
+
+    export let img = '', title = '', size = 400;
+
+    $: mx = size - 36;
+</script>
+
+<main style:background-image="url('{img}')" style:height="{size}px" style:--top="{Math.min($pageScroll, mx) / 2 - 20}px" style:--mx="-{mx}px">
+    <h1 style="margin: 0">{title}</h1>
+</main>
+
+<style lang="scss">
+  main {
+    margin: 0 0 12px 0;
+    padding: 24px;
+    width: calc(100% - 48px);
+
+    border-radius: 12px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: end;
+
+    background-size: cover;
+    background-position: center calc(50% + var(--top));
+
+    position: sticky;
+    top: var(--mx);
+    z-index: 100;
+  }
+</style>
