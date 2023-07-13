@@ -1,12 +1,13 @@
 <script lang="ts">
-    import {pageScroll} from "$stores/ui";
+    import {leftNav, pageScroll} from "$stores/ui";
 
     export let img = '', title = '', size = 400;
 
-    $: mx = size - 36;
+    $: mx = +size + ($leftNav ? -36 : -100);
 </script>
 
-<main style:background-image="url('{img}')" style:height="{size}px" style:--top="{Math.min($pageScroll, mx) / 2 - 20}px" style:--mx="-{mx}px">
+<main style:background-image="url('{img}')" style:height="{size}px" style:--top="{Math.min($pageScroll, mx) / 2 - 20}px"
+      style:--mx="-{mx}px" class:top={!$leftNav}>
     <h1 style="margin: 0">{title}</h1>
 </main>
 
@@ -28,5 +29,10 @@
     position: sticky;
     top: var(--mx);
     z-index: 100;
+
+    &.top {
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
+    }
   }
 </style>

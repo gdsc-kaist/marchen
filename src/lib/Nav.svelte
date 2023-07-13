@@ -76,10 +76,12 @@
         if ($leftNav) setTimeout(() => anim = true, 200);
         else anim = false;
     }
+
+    $: if(!$leftNav) expand = true;
 </script>
 
 <nav class:leftNav={$leftNav} class:topNav={!$leftNav} style:--height={$navHeight + 'px'}
-     class:expand={expand && over?.extra} class:anim
+     class:expand={expand && over?.extra} class:anim style:--nav="{$leftNav ? '70px' : '260px'}"
      on:mouseenter={() => expandable = true} on:mouseleave={() => (expandable = false, _overI = overI = -1)}>
     <div class="menu">
         {#if !$leftNav}
@@ -156,8 +158,8 @@
   nav {
     position: fixed;
     background: var(--primary-light2);
-    z-index: 100;
     color: var(--on-primary);
+    z-index: 101;
 
     &.leftNav .menu {
       padding-left: 4px;
