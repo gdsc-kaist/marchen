@@ -153,9 +153,10 @@
     justify-content: center;
     align-items: center;
     margin-bottom: 24px;
+    flex-wrap: wrap;
 
     & > :global(*) {
-      margin: 0 10px;
+      margin: 0 10px 10px 10px;
     }
   }
 
