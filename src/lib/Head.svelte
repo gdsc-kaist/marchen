@@ -8,7 +8,7 @@
 
 <main style:background-image="url('{img}')" style:height="{size}px" style:--top="{Math.min($pageScroll, mx) / 2 - 20}px"
       style:--mx="-{mx}px" class:top={!$leftNav}>
-    <h1 style="margin: 0">{title}</h1>
+    <h1>{title}</h1>
 </main>
 
 <style lang="scss">
@@ -33,6 +33,11 @@
     &.top {
       border-top-left-radius: 0;
       border-top-right-radius: 0;
+    }
+
+    h1 {
+      margin: 0;
+      font-weight: 700;
     }
   }
 </style>
