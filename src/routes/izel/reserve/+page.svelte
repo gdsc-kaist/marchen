@@ -1,10 +1,12 @@
 <script lang="ts">
-    import {Card, LinearProgress} from "nunui";
+    import {Card, LinearProgress, Button} from "nunui";
     import {fly} from "svelte/transition";
     import Head from "$lib/Head.svelte";
 
     let date = 0;
     let step = 0;
+    let hour = 0;
+    let minute = 0;
     $: progress = (step + 0.5) / 8;
 
     const selectIzel = (idx: number) => () => {
@@ -13,6 +15,14 @@
 
     const selectDate = (idx: number, to: number) => () => {
         date = idx;
+        step = to;
+    }
+    const selectHour = (idx: number, to: number) => () => {
+        hour = idx;
+        step = to;
+    }
+    const selectMinute = (idx: number, to: number) => () => {
+        minute = idx;
         step = to;
     }
 </script>
@@ -62,7 +72,7 @@
             <div class="row" in:fly={{y: 10}}>
                 <span>오전</span>
                 {#each {length: 12} as _, i}
-                    <Card ripple on:click={() => step = 3}>
+                    <Card primary={hour===i+1} ripple on:click={selectHour(i+1, 3)}>
                         {i + 1}시
                     </Card>
                 {/each}
@@ -70,7 +80,7 @@
             <div class="row" in:fly={{y: 10}}>
                 <span>오후</span>
                 {#each {length: 12} as _, i}
-                    <Card ripple on:click={() => step = 3}>
+                    <Card primary={hour===i+13} ripple on:click={selectHour(i+13, 3)}>
                         {i + 1}시
                     </Card>
                 {/each}
@@ -80,7 +90,7 @@
             <div class="row" in:fly={{y: 10}}>
                 <span>분</span>
                 {#each {length: 12} as _, i}
-                    <Card ripple on:click={() => step = 4}>
+                    <Card primary={minute===i*5} ripple on:click={selectMinute(i * 5, 4)}>
                         {i * 5}분
                     </Card>
                 {/each}
@@ -94,7 +104,7 @@
             {new Date().getMonth() + 1}월 {new Date().getDate() + date}일부터 언제까지요?
         </h1>
         <div class="row">
-            <Card primary={date===0} ripple on:click={selectDate(0, 5)}>
+            <Card  primary={date===0} ripple on:click={selectDate(0, 5)}>
                 오늘
             </Card>
             <Card primary={date===1} ripple on:click={selectDate(1, 5)}>
@@ -113,7 +123,7 @@
             <div class="row" in:fly={{y: 10}}>
                 <span>오전</span>
                 {#each {length: 12} as _, i}
-                    <Card ripple on:click={() => step = 6}>
+                    <Card primary={hour===i+1} ripple on:click={selectHour(i+1, 6)}>
                         {i + 1}시
                     </Card>
                 {/each}
@@ -121,23 +131,31 @@
             <div class="row" in:fly={{y: 10}}>
                 <span>오후</span>
                 {#each {length: 12} as _, i}
-                    <Card ripple on:click={() => step = 3}>
+                    <Card primary={hour===i+13} ripple on:click={selectHour(i+13, 6)}>
                         {i + 1}시
                     </Card>
                 {/each}
             </div>
         {/if}
         {#if step >= 6}
-            <div class="row" in:fly={{y: 10}}>
-                <span>분</span>
-                {#each {length: 12} as _, i}
-                    <Card ripple on:click={() => step = 4}>
-                        {i * 5}분
-                    </Card>
-                {/each}
-            </div>
+        <div class="row" in:fly={{y: 10}}>
+            <span>분</span>
+            {#each {length: 12} as _, i}
+                <Card primary={minute===i*5} ripple on:click={selectMinute(i * 5, 7)}>
+                    {i * 5}분
+                </Card>
+            {/each}
+        </div>
         {/if}
     </main>
+{/if}
+{#if step >= 7}
+<main>
+    <h1>예약 정보를 입력하세요</h1>
+    <a href="/izel/info">
+        <Button>정보 입력하러 가기</Button>
+    </a>
+</main>
 {/if}
 
 <style lang="scss">
