@@ -1,27 +1,35 @@
 <script  lang="ts">
     export let dateIdx:number, hourIdx:number, minuteIdx:number, key:number;
-    import { fly } from "svelte/transition";
+    import { fly, scale } from "svelte/transition";
     import {Input, Card, Button} from "nunui";
     import { onMount } from 'svelte';
+    import { flip } from 'svelte/animate';
+	import { send, receive } from './transition.js';
+	import Page from "../routes/+page.svelte";
 
     let isAfternoon = false;
     let now = new Date();
 
-    let dateList:{month:number, day:string, date: number}[];
+    type dateWithDay = {month:number, date:number, day:string, idx: number}
+    let dateList: dateWithDay[];
     const hourList = [...Array(12).keys()].map((e)=>(e?e:12));
     const minuteList = [...Array(6).keys()].map((e)=>(e*10));
     const dayList = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일']
     $: {
         if (now) {
-            dateList = [...Array(3)].map((e, i)=> {
+            dateList = [...Array(16)].map((e, i)=> {
             let tempDate = now;
             if (i) {
                 tempDate = new Date(now.setDate(now.getDate()+1));
             }
+            let m = tempDate.getMonth()+1;
+            let d = tempDate.getDate();
+            let day = dayList[tempDate.getDay()];
             return {
-                month: tempDate.getMonth()+1,
-                day: dayList[tempDate.getDay()],
-                date: tempDate.getDate(),
+                month: m,
+                day: day,
+                date: d,
+                idx: i
             }});
             console.log(dateList);
         }
@@ -32,31 +40,61 @@
             else if (!isAfternoon && hourIdx>13) hourIdx -= Number(isAfternoon)*12;
         }
     }
+    let moreDays = false;
+    let opened = false;
+    let fullDateList: dateWithDay[];
+    $: {
+        if (moreDays) {
+            fullDateList = dateList;
+            opened = true;
+        } else {
+            if (opened || fullDateList === undefined) {
+                if (dateIdx >= 3) {
+                    fullDateList = dateList.slice(0, 2);
+                    fullDateList.push({month: 0, day: "", date: 0, idx: -1});
+                    fullDateList.push(dateList.at(dateIdx) as dateWithDay)
+                } else {
+                    fullDateList = dateList.slice(0, 3);
+                    fullDateList.push({month: 0, day: "", date: 0, idx: -1})
+                }
+            }
+            opened = false;
+        }
+    }
+
 </script>
+
 <div class="middle">
-    <div class="day" in:fly={{y: 10,delay: 100}} out:fly={{y: -10,duration: 100}}>
-        {#each dateList as {month, date, day}, i}
-            <div class="day-card">
-                <Card primary={i== dateIdx} ripple key={i} on:click={()=>{dateIdx=i}}>
-                    <b>{`${month}월 ${date}일`}</b>
-                    <br />
-                    {day}
-                </Card>
-                {#if i===0}
-                    <div class="dot">오늘</div>
-                {/if}
-                {#if i===1}
-                    <div class="dot">내일</div>
+    <div class="day" in:fly={{y: 10,duration: 100}} out:fly={{y: -10,duration: 100}}>
+        {#each fullDateList as {month, date, day, idx} (idx)}
+            <div in:receive={{key: idx}} out:send={{key: idx}} animate:flip={{duration: 600}}>
+                {#if month===0}
+                    <div>
+                        <Card class="etc" ripple on:click={()=>{moreDays=true}} >
+                            <br />...
+                        </Card>
+                    </div>
+                {:else}
+                    <div class="day-card">
+                        <Card primary={idx== dateIdx} ripple key={idx} on:click={()=>{dateIdx=idx; moreDays=false}}>
+                            <b class="day-text">{`${month}월 ${date}일`}</b>
+                            <br />
+                            {day}
+                        </Card>
+                        {#if idx===0}
+                        <div class="dot">오늘</div>
+                        {/if}
+                        {#if idx===1}
+                        <div class="dot">내일</div>
+                        {/if}
+                    </div>
                 {/if}
             </div>
         {/each}
-        <Card class="etc">
-            <br />...
-        </Card>
     </div>
-    {#if (dateIdx !== undefined)}
-    <div class="down-arrow" in:fly={{y: 10,delay: 100}} out:fly={{y: -10,duration: 100}}>▼</div>
-    <div class="row" in:fly={{y: 10,delay: 100}} out:fly={{y: -10,duration: 100}}>
+    {#if (dateIdx !== undefined && !moreDays)}
+    <div class="down-arrow" in:fly={{y: 10, duration: 100}} out:fly={{y: -10, duration: 100}}>▼</div>
+    <div class="row" in:fly={{y: 10, duration: 100}} out:fly={{y: -10, duration: 100}}>
         <div class="switch-wrapper">
             <input class='switch-input' type="checkbox" id={`switch-${key}`} value={isAfternoon} on:change={()=>{isAfternoon=!isAfternoon}}>
             <label for={`switch-${key}`} class="switch_label">
@@ -72,9 +110,9 @@
         {/each}
     </div>    
     {/if}
-    {#if (hourIdx !== undefined)}
-    <div class="down-arrow" in:fly={{y: 10,delay: 100}} out:fly={{y: -10,duration: 100}}>▼</div>
-    <div  class="row" in:fly={{y: 10,delay: 100}} out:fly={{y: -10,duration: 100}}>
+    {#if (hourIdx !== undefined && !moreDays)}
+    <div class="down-arrow" in:fly={{y: 10, duration: 100}} out:fly={{y: -10,duration: 100}}>▼</div>
+    <div  class="row" in:fly={{y: 10, duration: 100}} out:fly={{y: -10,duration: 100}}>
         <div></div>
         {#each minuteList as minute, i}
             <div>
@@ -104,17 +142,21 @@
     }
     .day {
         display: grid;
-        gap: 1rem;
-        grid-template-columns: repeat(3, 2fr) 1fr;
+        gap: 0.5rem 1rem;
+        grid-template-columns: repeat(4, auto);
         text-align: center;
     }
     .day-card {
         position: relative;
     }
+    .day-text {
+        position: relative;
+        margin: 0px 10px
+    }
     .dot {
         position: absolute;
-        top: -4px;
-        left: -4px;
+        top: -5px;
+        left: -7px;
         padding: 4px;
         border-radius: 12px;
         background-color: var(--primary);
