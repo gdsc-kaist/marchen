@@ -32,8 +32,7 @@
     .info {
         position: relative;
         display: grid;
-        gap: 16px;
-        grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+        gap: 20px;
         .inputs {
             display: grid;
             gap: 8px;

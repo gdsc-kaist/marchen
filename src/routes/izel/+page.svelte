@@ -78,11 +78,11 @@
       h3 {
         margin: 0.7em 0;
       }
+      img {
+        height: 100px;
+        width: 100px;
+        object-fit: cover;
+      }
     }
-  }
-  img {
-    height: 100px;
-    width: 100px;
-    object-fit: cover;
   }
 </style>
