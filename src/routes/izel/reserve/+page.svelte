@@ -152,7 +152,7 @@
 {#if step >= 7}
 <main>
     <h1>예약 정보를 입력하세요</h1>
-    <a href="/izel/info">
+    <a href="/izel/reserve-end">
         <Button>정보 입력하러 가기</Button>
     </a>
 </main>
