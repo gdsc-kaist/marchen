@@ -2,6 +2,12 @@
     import {Card, LinearProgress, Button} from "nunui";
     import {fly} from "svelte/transition";
     import Head from "$lib/Head.svelte";
+	import TimePicker from "$lib/TimePicker.svelte";
+
+  const izels = [
+    {name: '나무 이젤'},
+    {name: '철제 이젤'},
+  ]
 
     let date = 0;
     let step = 0;
@@ -27,169 +33,82 @@
     }
 </script>
 
-<Head title="이젤 대여" size="200"
+<Head title="이젤 대여" size="150"
       img="https://images.unsplash.com/photo-1595378426340-19a317b875e3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1365&q=80"/>
 
 <LinearProgress {progress}/>
-{#if step === 0}
-    <main in:fly={{y: 10,delay: 100}} out:fly={{y: -10,duration: 100}}>
-        <h1>어떤 이젤을 빌릴까요?</h1>
-        <div class="row">
-            <div style="position: relative">
-                <Card ripple on:click={selectIzel(0)}>
-                    <div class="frame">몰</div>
-                </Card>
-                <div class="dot">10개</div>
-            </div>
-            <Card ripple on:click={selectIzel(1)}>
-                <div class="frame">루</div>
-            </Card>
-            <Card ripple on:click={selectIzel(2)}>
-                <div class="frame">?</div>
-            </Card>
+<div class="content">
+  <div class="container">
+    <h2>무슨 이젤을 빌릴까요?</h2>
+    <div class="thing-list">
+      {#each izels as {name}}
+      <Card>
+        <div class="thing">
+          <img 
+            src="https://img.freepik.com/premium-vector/empty-canvas-on-wooden-easel-wooden-brown-easel_349999-1056.jpg"
+            alt="test image"
+          />
+          <h3>{name}</h3>
         </div>
-    </main>
-{:else if step >= 1 && step <= 3}
-    <main in:fly={{y: 10,delay: 100}} out:fly={{y: -10,duration: 100}}>
-        <h1>언제부터요?</h1>
-        <div class="row">
-            <Card primary={date===0} ripple on:click={selectDate(0, 2)}>
-                오늘
-            </Card>
-            <Card primary={date===1} ripple on:click={selectDate(1, 2)}>
-                내일
-            </Card>
-            <Card primary={date===2} ripple on:click={selectDate(2, 2)}>
-                모레
-            </Card>
-            {#each {length: 5} as _, i}
-                <Card primary={date===i+3} ripple on:click={selectDate(3+i, 2)}>
-                    {new Date().getMonth() + 1}월 {new Date().getDate() + i + 3}일
-                </Card>
-            {/each}
-        </div>
-        {#if step >= 2}
-            <div class="row" in:fly={{y: 10}}>
-                <span>오전</span>
-                {#each {length: 12} as _, i}
-                    <Card primary={hour===i+1} ripple on:click={selectHour(i+1, 3)}>
-                        {i + 1}시
-                    </Card>
-                {/each}
-            </div>
-            <div class="row" in:fly={{y: 10}}>
-                <span>오후</span>
-                {#each {length: 12} as _, i}
-                    <Card primary={hour===i+13} ripple on:click={selectHour(i+13, 3)}>
-                        {i + 1}시
-                    </Card>
-                {/each}
-            </div>
-        {/if}
-        {#if step >= 3}
-            <div class="row" in:fly={{y: 10}}>
-                <span>분</span>
-                {#each {length: 12} as _, i}
-                    <Card primary={minute===i*5} ripple on:click={selectMinute(i * 5, 4)}>
-                        {i * 5}분
-                    </Card>
-                {/each}
-            </div>
-        {/if}
-    </main>
-{/if}
-{#if step >= 4 && step <= 6}
-    <main in:fly={{y: 10,delay: 100}} out:fly={{y: -10,duration: 100}}>
-        <h1>
-            {new Date().getMonth() + 1}월 {new Date().getDate() + date}일부터 언제까지요?
-        </h1>
-        <div class="row">
-            <Card  primary={date===0} ripple on:click={selectDate(0, 5)}>
-                오늘
-            </Card>
-            <Card primary={date===1} ripple on:click={selectDate(1, 5)}>
-                내일
-            </Card>
-            <Card primary={date===2} ripple on:click={selectDate(2, 5)}>
-                모레
-            </Card>
-            {#each {length: 5} as _, i}
-                <Card primary={date===i+3} ripple on:click={selectDate(3+i, 5)}>
-                    {new Date().getMonth() + 1}월 {new Date().getDate() + i + 3}일
-                </Card>
-            {/each}
-        </div>
-        {#if step >= 5}
-            <div class="row" in:fly={{y: 10}}>
-                <span>오전</span>
-                {#each {length: 12} as _, i}
-                    <Card primary={hour===i+1} ripple on:click={selectHour(i+1, 6)}>
-                        {i + 1}시
-                    </Card>
-                {/each}
-            </div>
-            <div class="row" in:fly={{y: 10}}>
-                <span>오후</span>
-                {#each {length: 12} as _, i}
-                    <Card primary={hour===i+13} ripple on:click={selectHour(i+13, 6)}>
-                        {i + 1}시
-                    </Card>
-                {/each}
-            </div>
-        {/if}
-        {#if step >= 6}
-        <div class="row" in:fly={{y: 10}}>
-            <span>분</span>
-            {#each {length: 12} as _, i}
-                <Card primary={minute===i*5} ripple on:click={selectMinute(i * 5, 7)}>
-                    {i * 5}분
-                </Card>
-            {/each}
-        </div>
-        {/if}
-    </main>
-{/if}
-{#if step >= 7}
-<main>
-    <h1>예약 정보를 입력하세요</h1>
-    <a href="/izel/info">
-        <Button>정보 입력하러 가기</Button>
-    </a>
-</main>
-{/if}
-
+      </Card>
+      {/each}
+    </div>
+  </div>
+  <div class="container">
+    <h2>언제부터 빌릴까요?</h2>
+    <TimePicker />
+  </div>
+  <div class="container">
+    <h2>언제까지 빌릴까요?</h2>
+    <TimePicker />
+  </div>
+</div>
+<div class="footer">
+  <Button outlined>이전</Button>
+  <Button primary>대여 정보 입력</Button>
+</div>
 <style lang="scss">
-  main {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .row {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 24px;
-    flex-wrap: wrap;
-
-    & > :global(*) {
-      margin: 0 10px 10px 10px;
+  .content {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    padding: 0.5rem;
+    h2 {
+      text-align: center;
+      margin-bottom: 1rem;
     }
   }
-
-  .frame {
-    width: 200px;
-    height: 200px;
+  .container {
+    border-radius: 10px;
+    box-shadow: 0 0 10px 0 #00000040;
+    padding: 0.5rem;
   }
-
-  .dot {
-    position: absolute;
-    top: -4px;
-    right: -4px;
-    padding: 4px;
-    border-radius: 12px;
-    background-color: var(--primary-light2);
-    font-size: 12px;
+  .footer {
+      display: flex;
+      justify-content: space-between;
+  }
+  .thing-list {
+    display: grid;
+    gap: 16px;
+    width: 100%;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    .thing {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: 100px 1fr;
+      grid-template-rows: 1fr 40px;
+      >*:first-child {
+        grid-column: 1 / 2;
+        grid-row: 1 / 3
+      }
+      h3 {
+        margin: 0.7em 0;
+      }
+      img {
+        height: 100px;
+        width: 100px;
+        object-fit: cover;
+      }
+    }
   }
 </style>
