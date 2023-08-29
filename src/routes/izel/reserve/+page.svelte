@@ -8,28 +8,32 @@
     {name: '나무 이젤'},
     {name: '철제 이젤'},
   ]
-
-    let date = 0;
     let step = 0;
-    let hour = 0;
-    let minute = 0;
-    $: progress = (step + 0.5) / 8;
-
-    const selectIzel = (idx: number) => () => {
-        step = 1;
+    let izel:number;
+    let startDate:number, startHour:number, startMinute:number;
+    let endDate:number, endHour:number, endMinute:number;
+  
+    $: progress = (step + 0.5) / 7;
+    $: {
+      if (izel !== undefined) step = Math.max(step, 1);
     }
-
-    const selectDate = (idx: number, to: number) => () => {
-        date = idx;
-        step = to;
+    $: {
+      if (startDate !== undefined) step = Math.max(step, 2);
     }
-    const selectHour = (idx: number, to: number) => () => {
-        hour = idx;
-        step = to;
+    $: {
+      if (startHour !== undefined) step = Math.max(step, 3);
     }
-    const selectMinute = (idx: number, to: number) => () => {
-        minute = idx;
-        step = to;
+    $: {
+      if (startMinute !== undefined) step = Math.max(step, 4);
+    }
+    $: {
+      if (endDate !== undefined) step = Math.max(step, 5);
+    }
+    $: {
+      if (endHour !== undefined) step = Math.max(step, 6);
+    }
+    $: {
+      if (endMinute !== undefined) step = Math.max(step, 7);
     }
 </script>
 
@@ -41,8 +45,8 @@
   <div class="container">
     <h2>무슨 이젤을 빌릴까요?</h2>
     <div class="thing-list">
-      {#each izels as {name}}
-      <Card>
+      {#each izels as {name}, i}
+      <Card on:click={()=>{izel = i}} key={i} primary={i== izel}>
         <div class="thing">
           <img 
             src="https://img.freepik.com/premium-vector/empty-canvas-on-wooden-easel-wooden-brown-easel_349999-1056.jpg"
@@ -56,23 +60,38 @@
   </div>
   <div class="container">
     <h2>언제부터 빌릴까요?</h2>
-    <TimePicker />
+    {#if (step >= 1)}
+    <TimePicker 
+      bind:dateIdx = {startDate}
+      bind:hourIdx = {startHour}
+      bind:minuteIdx = {startMinute}
+      key={0}
+    />
+    {/if}
   </div>
   <div class="container">
     <h2>언제까지 빌릴까요?</h2>
-    <TimePicker />
+    {#if (step >= 4)}
+    <TimePicker 
+      bind:dateIdx = {endDate}
+      bind:hourIdx = {endHour}
+      bind:minuteIdx = {endMinute}
+      key={1}
+    />
+    {/if}
   </div>
 </div>
 <div class="footer">
   <Button outlined>이전</Button>
-  <Button primary>대여 정보 입력</Button>
+  <Button primary disabled={step < 7}>대여 정보 입력</Button>
 </div>
 <style lang="scss">
   .content {
     display: grid;
     gap: 1rem;
-    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     padding: 0.5rem;
+    user-select: none;
     h2 {
       text-align: center;
       margin-bottom: 1rem;
@@ -82,6 +101,10 @@
     border-radius: 10px;
     box-shadow: 0 0 10px 0 #00000040;
     padding: 0.5rem;
+    &:not(:first-child) {
+      min-height: 400px;
+      grid-column: span 2;
+    }
   }
   .footer {
       display: flex;
