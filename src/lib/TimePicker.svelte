@@ -36,8 +36,8 @@
     }
     $: {
         if (hourIdx!== undefined) {
-            if (isAfternoon && hourIdx<12) hourIdx += Number(isAfternoon)*12;
-            else if (!isAfternoon && hourIdx>13) hourIdx -= Number(isAfternoon)*12;
+            if (isAfternoon && hourIdx<12) hourIdx += 12;
+            else if (!isAfternoon && hourIdx>=12) hourIdx -= 12;
         }
     }
     let moreDays = false;
@@ -98,7 +98,9 @@
         <div class="switch-wrapper">
             <input class='switch-input' type="checkbox" id={`switch-${key}`} value={isAfternoon} on:change={()=>{isAfternoon=!isAfternoon}}>
             <label for={`switch-${key}`} class="switch_label">
-                <span class="onf_btn">{isAfternoon?'오후':'오전'}</span>
+                <div class="text">오전</div>
+                <div class="text">오후</div>
+                <span class="onf_btn"></span>
             </label>
         </div>
         {#each hourList as hour, i}
@@ -134,7 +136,7 @@
     .row {
         display: grid;
         grid-template-columns: repeat(7, 1fr);
-        gap: 1rem;
+        gap: 0 1rem;
         text-align: center;
     }
     .down-arrow {
@@ -163,50 +165,63 @@
         font-size: 12px;
         color: #fff;
     }
+
     .switch-wrapper {
+        margin: 6px 0;
         user-select: none;
         grid-row: 1/3;
         .switch-input {
-        position: absolute;
-        /* hidden */
-        appearance: none;
-        -webkit-appearance: none;
-        -moz-appearance: none;
+            position: absolute;
+            /* hidden */
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
         }
 
         .switch_label {
-        position: relative;
-        cursor: pointer;
-        display: inline-block;
-        width: 100%;
-        height: 100%;
-        background: #fff;
-        border-radius: 10px;
-        transition: 0.2s;
+            position: relative;
+            cursor: pointer;
+            display: inline-block;
+            width: 100%;
+            height: 100%;
+            background: var(--surface);
+            border-radius: 12px;
+            transition: 0.2s;
+            box-shadow: 10px 10px 22px rgba(0, 0, 0, 0.0352941176), -10px -10px 22px rgba(0, 0, 0, 0.0352941176);
         }
         .onf_btn {
-        position: absolute;
-        top: 5%;
-        left: 5%;
-        display: inline-block;
-        width: 90%;
-        height: 40%;
-        border-radius: 8px;
-        background: var(--primary-light2);
-        transition: 0.2s;
+            position: absolute;
+            top: 4%;
+            left: 8%;
+            display: inline-block;
+            width: 84%;
+            height: 38%;
+            border-radius: 8px;
+            background: var(--primary-light2);
+            transition: 0.2s;
+            box-shadow: 10px 10px 22px rgba(0, 0, 0, 0.0352941176), -10px -10px 22px rgba(0, 0, 0, 0.0352941176);
+            z-index: 0;
+        }
+        .text {
+            position: relative;
+            height: calc(50% - 6px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            z-index: 1;
+            &:first-child {
+                margin-bottom: 6px;
+            }
+            &:nth-child(2) {
+                margin-top: 12px;
+            }
         }
 
         /* checking style */
-        .switch-input:checked+.switch_label, 
-        .switch-input:checked+.switch_label:hover {
-        background: var(--primary-light2);
-        }
 
         /* move */
         .switch-input:checked+.switch_label .onf_btn {
-        top: 50%;
-        background: #fff;
-        box-shadow: 1px 2px 3px #00000020;
+            top: 58%;
         }
     }
 </style>

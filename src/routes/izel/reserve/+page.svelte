@@ -37,7 +37,7 @@
     }
 </script>
 
-<Head title="이젤 대여" size="150"
+<Head title="이젤 대여" size={150}
       img="https://images.unsplash.com/photo-1595378426340-19a317b875e3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1365&q=80"/>
 
 <LinearProgress {progress}/>
@@ -101,8 +101,9 @@
     border-radius: 10px;
     box-shadow: 0 0 10px 0 #00000040;
     padding: 0.5rem;
+    overflow: hidden;
     &:not(:first-child) {
-      min-height: 400px;
+      height: 400px;
       grid-column: span 2;
     }
   }
