@@ -3,7 +3,7 @@
     import Head from "$lib/Head.svelte";
 </script>
 <main class="main">
-    <Head title="물품 대여" size="200"
+    <Head title="물품 대여" size={200}
         img="https://images.unsplash.com/photo-1595378426340-19a317b875e3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1365&q=80"
     />
 

@@ -76,6 +76,9 @@
       bind:dateIdx = {endDate}
       bind:hourIdx = {endHour}
       bind:minuteIdx = {endMinute}
+      disabledDateIdx = {startDate}
+      disabledHourIdx = {startHour}
+      disabledMinuteIdx = {startMinute}
       key={1}
     />
     {/if}

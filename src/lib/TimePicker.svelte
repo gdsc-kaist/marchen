@@ -1,5 +1,6 @@
 <script  lang="ts">
     export let dateIdx:number, hourIdx:number, minuteIdx:number, key:number;
+    export let disabledDateIdx:number=-1, disabledHourIdx:number=-1 , disabledMinuteIdx:number=-1;
     import { fly, scale } from "svelte/transition";
     import {Input, Card, Button} from "nunui";
     import { onMount } from 'svelte';
@@ -75,7 +76,7 @@
                         </Card>
                     </div>
                 {:else}
-                    <div class="day-card">
+                    <div class={`day-card ${idx < disabledDateIdx || (idx==disabledDateIdx && disabledHourIdx==23 && disabledMinuteIdx==5) ? 'disabled':''}`}>
                         <Card primary={idx== dateIdx} ripple key={idx} on:click={()=>{dateIdx=idx; moreDays=false}}>
                             <b class="day-text">{`${month}월 ${date}일`}</b>
                             <br />
@@ -104,7 +105,7 @@
             </label>
         </div>
         {#each hourList as hour, i}
-            <div>
+            <div class={dateIdx==disabledDateIdx&&(i<disabledHourIdx||i==disabledHourIdx&&disabledMinuteIdx==5)?'disabled':''}>
                 <Card primary={i==hourIdx-Number(isAfternoon)*12} ripple key={i} on:click={()=>{hourIdx=i+Number(isAfternoon)*12}}>
                     {hour}시
                 </Card>
@@ -117,7 +118,7 @@
     <div  class="row" in:fly={{y: 10, duration: 100}} out:fly={{y: -10,duration: 100}}>
         <div></div>
         {#each minuteList as minute, i}
-            <div>
+            <div class={dateIdx==disabledDateIdx&&hourIdx==disabledHourIdx&&i<=disabledMinuteIdx?'disabled':''}>
                 <Card primary={i==minuteIdx} ripple key={i} on:click={()=>{minuteIdx=i}}>
                     {minute}분
                 </Card>
@@ -164,6 +165,11 @@
         background-color: var(--primary);
         font-size: 12px;
         color: #fff;
+    }
+
+    .disabled {
+        color:#888;
+        pointer-events: none;
     }
 
     .switch-wrapper {
