@@ -85,8 +85,8 @@
   </div>
 </div>
 <div class="footer">
-  <Button outlined>이전</Button>
-  <Button primary disabled={step < 7}>대여 정보 입력</Button>
+  <a href='/izel'><Button outlined>이전</Button></a>
+  <a href={step < 7? null:'/izel/reserve-end'}><Button primary disabled={step < 7}>대여 정보 입력</Button></a>
 </div>
 <style lang="scss">
   .content {

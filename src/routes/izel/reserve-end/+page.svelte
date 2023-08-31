@@ -1,13 +1,18 @@
 <script lang="ts">
     import {Input, Card, Button} from "nunui";
-    import {subDivision, clubName, borrowerName, rentalReason} from "../stores.js";
+    import {subDivision, clubName, borrowerName, rentalReason} from "$stores/reserve.js";
     import Head from "$lib/Head.svelte";
     const thingName = "이젤";
     const thingCount = 3;
-    const thingPeriod = '2023.07.25 오전 2시 ~ 2023. 07.27 오후 2시';    
+    const thingPeriod = '2023.07.25 오전 2시 ~ 2023. 07.27 오후 2시';
+    let isInfoFilled;
+    const updateReserveInfo=()=> {
+        // DB 에 업데이트 하는 기능 구현
+    }
+    $: isThingInfoFilled = !!$subDivision && !!$clubName && !!$borrowerName && !!$rentalReason;
 </script>
 
-<Head title="이젤 대여" size="150"
+<Head title="이젤 대여" size={150}
       img="https://images.unsplash.com/photo-1595378426340-19a317b875e3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1365&q=80"/>
 <div class="info">
     <Card>
@@ -50,7 +55,9 @@
     <a href="/izel/reserve">
         <Button outlined>이전</Button>
     </a>
-    <Button primary>대여 완료</Button>
+    <a href={isThingInfoFilled ? '/izel': null}>
+        <Button primary disabled={!isThingInfoFilled} on:click={updateReserveInfo}>대여 완료</Button>
+    </a>
 </div>
 <style lang="scss">
     .info {
