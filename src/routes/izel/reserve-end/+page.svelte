@@ -1,8 +1,7 @@
 <script lang="ts">
     import {Input, Card, Button} from "nunui";
-    import {subDivision, clubName, borrowerName, rentalReason} from "$stores/reserve.js";
+    import {subDivision, clubName, borrowerName, rentalReason, borrowTimeString, returnTimeString, izelName} from "$stores/reserve.js";
     import Head from "$lib/Head.svelte";
-    const thingName = "이젤";
     const thingCount = 3;
     const thingPeriod = '2023.07.25 오전 2시 ~ 2023. 07.27 오후 2시';
     let isInfoFilled;
@@ -32,9 +31,9 @@
         <div class="check">
             <div class="read">
                 <h1 class="textmiddle">대여 정보 확인</h1>
-                <p>물품: {thingName}</p>
+                <p>물품: {$izelName}</p>
                 <p>수량: {thingCount}개</p>
-                <p>대여기간: {thingPeriod}</p>
+                <p>대여기간: {`${$borrowTimeString} ~ ${$returnTimeString}`}</p>
                 <p>분과명: {$subDivision}</p>
                 <p>동아리명: {$clubName}</p>
                 <p>대여자명: {$borrowerName}</p>

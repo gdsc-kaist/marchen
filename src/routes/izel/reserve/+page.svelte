@@ -2,12 +2,9 @@
     import {Card, LinearProgress, Button} from "nunui";
     import {fly} from "svelte/transition";
     import Head from "$lib/Head.svelte";
-	import TimePicker from "$lib/TimePicker.svelte";
+    import TimePicker from "$lib/TimePicker.svelte";
+    import {izels, borrowTime, returnTime, izelIdx} from "$stores/reserve.js";
 
-  const izels = [
-    {name: '나무 이젤'},
-    {name: '철제 이젤'},
-  ]
     let step = 0;
     let izel:number;
     let startDate:number, startHour:number, startMinute:number;
@@ -15,25 +12,46 @@
   
     $: progress = (step + 0.5) / 7;
     $: {
-      if (izel !== undefined) step = Math.max(step, 1);
+      if (izel !== undefined) {
+        step = Math.max(step, 1);
+        $izelIdx = izel;
+      }
     }
     $: {
-      if (startDate !== undefined) step = Math.max(step, 2);
+      if (startDate !== undefined) {
+        step = Math.max(step, 2);
+        $borrowTime.dateIdx=startDate;
+      }
     }
     $: {
-      if (startHour !== undefined) step = Math.max(step, 3);
+      if (startHour !== undefined) {
+        step = Math.max(step, 3);
+        $borrowTime.hourIdx=startHour;
+      }
     }
     $: {
-      if (startMinute !== undefined) step = Math.max(step, 4);
+      if (startMinute !== undefined) {
+        step = Math.max(step, 4);
+        $borrowTime.minuteIdx=startMinute;
+      }
     }
     $: {
-      if (endDate !== undefined) step = Math.max(step, 5);
+      if (endDate !== undefined) {
+        step = Math.max(step, 5);
+        $returnTime.dateIdx=endDate;
+      }
     }
     $: {
-      if (endHour !== undefined) step = Math.max(step, 6);
+      if (endHour !== undefined) {
+        step = Math.max(step, 6);
+        $returnTime.hourIdx=endHour;
+      }
     }
     $: {
-      if (endMinute !== undefined) step = Math.max(step, 7);
+      if (endMinute !== undefined) {
+        step = Math.max(step, 7);
+        $returnTime.minuteIdx=endMinute;
+      }
     }
 </script>
 
