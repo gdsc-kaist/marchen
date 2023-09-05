@@ -1,20 +1,60 @@
 <script  lang="ts">
-    export let dateIdx:number, hourIdx:number, minuteIdx:number, key:number;
+    export let dateIdx:number|undefined, hourIdx:number|undefined, minuteIdx:number|undefined, key:number|undefined;
+    export let disabledDateIdx:number=-1, disabledHourIdx:number=-1 , disabledMinuteIdx:number=-1;
     import { fly, scale } from "svelte/transition";
     import {Input, Card, Button} from "nunui";
-    import { onMount } from 'svelte';
     import { flip } from 'svelte/animate';
 	import { send, receive } from './transition.js';
-	import Page from "../routes/+page.svelte";
 
     let isAfternoon = false;
     let now = new Date();
 
     type dateWithDay = {month:number, date:number, day:string, idx: number}
     let dateList: dateWithDay[];
+    let timeInfo = [dateIdx, hourIdx, minuteIdx, disabledDateIdx, disabledHourIdx, disabledMinuteIdx, isAfternoon];
     const hourList = [...Array(12).keys()].map((e)=>(e?e:12));
     const minuteList = [...Array(6).keys()].map((e)=>(e*10));
     const dayList = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일']
+    function compareTime(i: number|boolean, timeInfo: (number|boolean)[], type: number) {
+        let [dateIdx, hourIdx, minuteIdx, disabledDateIdx, disabledHourIdx, disabledMinuteIdx, isAfternoon] = timeInfo;
+        switch (type) {
+            case 0: dateIdx = i; break;
+            case 1: hourIdx = i; break;
+            case 2: minuteIdx = i; break;
+            case 3: hourIdx = Number(hourIdx==undefined?(key?11:0)+Number(isAfternoon)*12:hourIdx) + (Number(i) - Number(isAfternoon))*12; break;
+            default: break;
+        }
+        let startDateIdx = key ? disabledDateIdx : dateIdx;
+        let startHourIdx = key ? disabledHourIdx : hourIdx;
+        let startMinuteIdx = key ? disabledMinuteIdx : minuteIdx;
+        let endDateIdx = key ? dateIdx : disabledDateIdx;
+        let endHourIdx = key ? hourIdx : disabledHourIdx;
+        let endMinuteIdx = key ? minuteIdx : disabledMinuteIdx;
+        if (startDateIdx == undefined) {
+            startDateIdx = 0;
+        }
+        if (startHourIdx == undefined) {
+            startHourIdx = 0;
+        }
+        if (startMinuteIdx == undefined) {
+            startMinuteIdx = 0;
+        }
+        if (endDateIdx == undefined) {
+            endDateIdx = 15;
+        }
+        if (endHourIdx == undefined) {
+            endHourIdx = 23;
+        }
+        if (endMinuteIdx == undefined) {
+            endMinuteIdx = 5;
+        }
+        console.log(key, type, i, startDateIdx, startHourIdx, startMinuteIdx, endDateIdx, endHourIdx, endMinuteIdx);
+        console.log(startDateIdx < endDateIdx || (startDateIdx==endDateIdx && (startHourIdx < endHourIdx || (startHourIdx == endHourIdx && startMinuteIdx < endMinuteIdx))));
+        
+        return startDateIdx < endDateIdx || (startDateIdx==endDateIdx && (startHourIdx < endHourIdx || (startHourIdx == endHourIdx && startMinuteIdx < endMinuteIdx)));
+    }
+
+    $: console.log(isAfternoon);
     $: {
         if (now) {
             dateList = [...Array(16)].map((e, i)=> {
@@ -36,8 +76,8 @@
     }
     $: {
         if (hourIdx!== undefined) {
-            if (isAfternoon && hourIdx<12) hourIdx += Number(isAfternoon)*12;
-            else if (!isAfternoon && hourIdx>13) hourIdx -= Number(isAfternoon)*12;
+            if (isAfternoon && hourIdx<12) hourIdx += 12;
+            else if (!isAfternoon && hourIdx>=12) hourIdx -= 12;
         }
     }
     let moreDays = false;
@@ -49,10 +89,10 @@
             opened = true;
         } else {
             if (opened || fullDateList === undefined) {
-                if (dateIdx >= 3) {
+                if (dateIdx ? dateIdx : 0 >= 3) {
                     fullDateList = dateList.slice(0, 2);
                     fullDateList.push({month: 0, day: "", date: 0, idx: -1});
-                    fullDateList.push(dateList.at(dateIdx) as dateWithDay)
+                    fullDateList.push(dateList.at(dateIdx ? dateIdx : 0) as dateWithDay)
                 } else {
                     fullDateList = dateList.slice(0, 3);
                     fullDateList.push({month: 0, day: "", date: 0, idx: -1})
@@ -61,13 +101,16 @@
             opened = false;
         }
     }
+    $: {
+        timeInfo = [dateIdx, hourIdx, minuteIdx, disabledDateIdx, disabledHourIdx, disabledMinuteIdx, isAfternoon]
+    }
 
 </script>
 
 <div class="middle">
     <div class="day" in:fly={{y: 10,duration: 100}} out:fly={{y: -10,duration: 100}}>
-        {#each fullDateList as {month, date, day, idx} (idx)}
-            <div in:receive={{key: idx}} out:send={{key: idx}} animate:flip={{duration: 600}}>
+        {#each fullDateList as {month, date, day, idx: i} (i)}
+            <div in:receive={{key: i}} out:send={{key: i}} animate:flip={{duration: 600}}>
                 {#if month===0}
                     <div>
                         <Card class="etc" ripple on:click={()=>{moreDays=true}} >
@@ -75,16 +118,16 @@
                         </Card>
                     </div>
                 {:else}
-                    <div class="day-card">
-                        <Card primary={idx== dateIdx} ripple key={idx} on:click={()=>{dateIdx=idx; moreDays=false}}>
+                    <div class={`day-card ${compareTime(i, timeInfo, 0) ?'':'disabled'}`}>
+                        <Card primary={i== dateIdx} ripple key={i} on:click={()=>{dateIdx=i; moreDays=false}}>
                             <b class="day-text">{`${month}월 ${date}일`}</b>
                             <br />
                             {day}
                         </Card>
-                        {#if idx===0}
+                        {#if i===0}
                         <div class="dot">오늘</div>
                         {/if}
-                        {#if idx===1}
+                        {#if i===1}
                         <div class="dot">내일</div>
                         {/if}
                     </div>
@@ -96,13 +139,15 @@
     <div class="down-arrow" in:fly={{y: 10, duration: 100}} out:fly={{y: -10, duration: 100}}>▼</div>
     <div class="row" in:fly={{y: 10, duration: 100}} out:fly={{y: -10, duration: 100}}>
         <div class="switch-wrapper">
-            <input class='switch-input' type="checkbox" id={`switch-${key}`} value={isAfternoon} on:change={()=>{isAfternoon=!isAfternoon}}>
+            <input class='switch-input' type="checkbox" id={`switch-${key}`} value={isAfternoon} checked={isAfternoon} on:change={()=>{isAfternoon=!isAfternoon}}>
             <label for={`switch-${key}`} class="switch_label">
-                <span class="onf_btn">{isAfternoon?'오후':'오전'}</span>
+                <div class={`text${compareTime(false, timeInfo, 3)?"":"-disabled"}`}>오전</div>
+                <div class={`text${compareTime(true, timeInfo, 3)?"":"-disabled"}`}>오후</div>
+                <span class="onf_btn"></span>
             </label>
         </div>
         {#each hourList as hour, i}
-            <div>
+            <div class={compareTime(i+Number(isAfternoon)*12, timeInfo, 1)?'':'disabled'}>
                 <Card primary={i==hourIdx-Number(isAfternoon)*12} ripple key={i} on:click={()=>{hourIdx=i+Number(isAfternoon)*12}}>
                     {hour}시
                 </Card>
@@ -115,7 +160,7 @@
     <div  class="row" in:fly={{y: 10, duration: 100}} out:fly={{y: -10,duration: 100}}>
         <div></div>
         {#each minuteList as minute, i}
-            <div>
+            <div class={compareTime(i, timeInfo, 2)?'':'disabled'}>
                 <Card primary={i==minuteIdx} ripple key={i} on:click={()=>{minuteIdx=i}}>
                     {minute}분
                 </Card>
@@ -134,7 +179,7 @@
     .row {
         display: grid;
         grid-template-columns: repeat(7, 1fr);
-        gap: 1rem;
+        gap: 0 1rem;
         text-align: center;
     }
     .down-arrow {
@@ -163,50 +208,83 @@
         font-size: 12px;
         color: #fff;
     }
+
+    .disabled {
+        color:#888;
+        /* pointer-events: none; */
+    }
+
     .switch-wrapper {
+        margin: 6px 0;
         user-select: none;
         grid-row: 1/3;
         .switch-input {
-        position: absolute;
-        /* hidden */
-        appearance: none;
-        -webkit-appearance: none;
-        -moz-appearance: none;
+            position: absolute;
+            /* hidden */
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
         }
 
         .switch_label {
-        position: relative;
-        cursor: pointer;
-        display: inline-block;
-        width: 100%;
-        height: 100%;
-        background: #fff;
-        border-radius: 10px;
-        transition: 0.2s;
+            position: relative;
+            cursor: pointer;
+            display: inline-block;
+            width: 100%;
+            height: 100%;
+            background: var(--surface);
+            border-radius: 12px;
+            transition: 0.2s;
+            box-shadow: 10px 10px 22px rgba(0, 0, 0, 0.0352941176), -10px -10px 22px rgba(0, 0, 0, 0.0352941176);
         }
         .onf_btn {
-        position: absolute;
-        top: 5%;
-        left: 5%;
-        display: inline-block;
-        width: 90%;
-        height: 40%;
-        border-radius: 8px;
-        background: var(--primary-light2);
-        transition: 0.2s;
+            position: absolute;
+            top: 4%;
+            left: 8%;
+            display: inline-block;
+            width: 84%;
+            height: 38%;
+            border-radius: 8px;
+            background: var(--primary-light2);
+            transition: 0.2s;
+            box-shadow: 10px 10px 22px rgba(0, 0, 0, 0.0352941176), -10px -10px 22px rgba(0, 0, 0, 0.0352941176);
+            z-index: 0;
+        }
+        .text {
+            position: relative;
+            height: calc(50% - 6px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            z-index: 1;
+            &:first-child {
+                margin-bottom: 6px;
+            }
+            &:nth-child(2) {
+                margin-top: 12px;
+            }
+        }
+        .text-disabled {
+            position: relative;
+            height: calc(50% - 6px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            z-index: 1;
+            &:first-child {
+                margin-bottom: 6px;
+            }
+            &:nth-child(2) {
+                margin-top: 12px;
+            }
+            color: #aaa;
         }
 
         /* checking style */
-        .switch-input:checked+.switch_label, 
-        .switch-input:checked+.switch_label:hover {
-        background: var(--primary-light2);
-        }
 
         /* move */
         .switch-input:checked+.switch_label .onf_btn {
-        top: 50%;
-        background: #fff;
-        box-shadow: 1px 2px 3px #00000020;
+            top: 58%;
         }
     }
 </style>

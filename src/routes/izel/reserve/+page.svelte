@@ -2,42 +2,68 @@
     import {Card, LinearProgress, Button} from "nunui";
     import {fly} from "svelte/transition";
     import Head from "$lib/Head.svelte";
-	import TimePicker from "$lib/TimePicker.svelte";
+    import TimePicker from "$lib/TimePicker.svelte";
+    import {izels, borrowTime, returnTime, izelIdx} from "$stores/reserve.js";
 
-  const izels = [
-    {name: '나무 이젤'},
-    {name: '철제 이젤'},
-  ]
     let step = 0;
     let izel:number;
     let startDate:number, startHour:number, startMinute:number;
     let endDate:number, endHour:number, endMinute:number;
+    let timeInfo = [startDate, startHour, startMinute, endDate, endHour, endMinute];
+
+    function checkTime(timeInfo:number[]) {
+      [startDate, startHour, startMinute, endDate, endHour, endMinute] = timeInfo;
+      return startDate < endDate || (startDate==endDate && (startHour < endHour || (startHour == endHour && startMinute < endMinute)));
+    }
   
     $: progress = (step + 0.5) / 7;
     $: {
-      if (izel !== undefined) step = Math.max(step, 1);
+      if (izel !== undefined) {
+        step = Math.max(step, 1);
+        $izelIdx = izel;
+      }
     }
     $: {
-      if (startDate !== undefined) step = Math.max(step, 2);
+      if (startDate !== undefined) {
+        step = Math.max(step, 2);
+        $borrowTime.dateIdx=startDate;
+      }
     }
     $: {
-      if (startHour !== undefined) step = Math.max(step, 3);
+      if (startHour !== undefined) {
+        step = Math.max(step, 3);
+        $borrowTime.hourIdx=startHour;
+      }
     }
     $: {
-      if (startMinute !== undefined) step = Math.max(step, 4);
+      if (startMinute !== undefined) {
+        step = Math.max(step, 4);
+        $borrowTime.minuteIdx=startMinute;
+      }
     }
     $: {
-      if (endDate !== undefined) step = Math.max(step, 5);
+      if (endDate !== undefined) {
+        step = Math.max(step, 5);
+        $returnTime.dateIdx=endDate;
+      }
     }
     $: {
-      if (endHour !== undefined) step = Math.max(step, 6);
+      if (endHour !== undefined) {
+        step = Math.max(step, 6);
+        $returnTime.hourIdx=endHour;
+      }
     }
     $: {
-      if (endMinute !== undefined) step = Math.max(step, 7);
+      if (endMinute !== undefined) {
+        step = Math.max(step, 7);
+        $returnTime.minuteIdx=endMinute;
+      }
     }
+    $: timeInfo = [startDate, startHour, startMinute, endDate, endHour, endMinute];
+
 </script>
 
-<Head title="이젤 대여" size="150"
+<Head title="이젤 대여" size={150}
       img="https://images.unsplash.com/photo-1595378426340-19a317b875e3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1365&q=80"/>
 
 <LinearProgress {progress}/>
@@ -46,11 +72,11 @@
     <h2>무슨 이젤을 빌릴까요?</h2>
     <div class="thing-list">
       {#each izels as {name}, i}
-      <Card on:click={()=>{izel = i}} key={i} primary={i== izel}>
+      <Card on:click={()=>{izel = i}} ripple key={i} primary={i== izel}>
         <div class="thing">
           <img 
             src="https://img.freepik.com/premium-vector/empty-canvas-on-wooden-easel-wooden-brown-easel_349999-1056.jpg"
-            alt="test image"
+            alt="test"
           />
           <h3>{name}</h3>
         </div>
@@ -65,6 +91,9 @@
       bind:dateIdx = {startDate}
       bind:hourIdx = {startHour}
       bind:minuteIdx = {startMinute}
+      disabledDateIdx = {endDate}
+      disabledHourIdx = {endHour}
+      disabledMinuteIdx = {endMinute}
       key={0}
     />
     {/if}
@@ -76,14 +105,24 @@
       bind:dateIdx = {endDate}
       bind:hourIdx = {endHour}
       bind:minuteIdx = {endMinute}
+      disabledDateIdx = {startDate}
+      disabledHourIdx = {startHour}
+      disabledMinuteIdx = {startMinute}
       key={1}
     />
     {/if}
   </div>
 </div>
 <div class="footer">
-  <Button outlined>이전</Button>
-  <Button primary disabled={step < 7}>대여 정보 입력</Button>
+  <a href='/izel'><Button outlined>이전</Button></a>
+  <div class="to-next">
+    {#if (step == 7 && !checkTime(timeInfo))}
+      <p class="warning">대여 종료 시간이 대여 시작 시간보다 빨라요.</p>
+    {/if}
+    <a href={step == 7 && checkTime(timeInfo)?'/izel/reserve-end':null}>
+      <Button primary disabled={step < 7 || !checkTime(timeInfo)}>대여 정보 입력</Button>
+    </a>
+  </div>
 </div>
 <style lang="scss">
   .content {
@@ -101,14 +140,24 @@
     border-radius: 10px;
     box-shadow: 0 0 10px 0 #00000040;
     padding: 0.5rem;
+    overflow: hidden;
     &:not(:first-child) {
-      min-height: 400px;
+      height: 400px;
       grid-column: span 2;
     }
   }
   .footer {
+    display: flex;
+    justify-content: space-between;
+    .to-next {
       display: flex;
-      justify-content: space-between;
+      gap: 1rem;
+      .warning {
+        margin-block-start: 0;
+        margin-block-end: 0;
+        align-self: center;
+      }
+    }
   }
   .thing-list {
     display: grid;
