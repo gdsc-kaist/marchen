@@ -3,19 +3,58 @@
     export let disabledDateIdx:number=-1, disabledHourIdx:number=-1 , disabledMinuteIdx:number=-1;
     import { fly, scale } from "svelte/transition";
     import {Input, Card, Button} from "nunui";
-    import { onMount } from 'svelte';
     import { flip } from 'svelte/animate';
 	import { send, receive } from './transition.js';
-	import Page from "../routes/+page.svelte";
 
     let isAfternoon = false;
     let now = new Date();
 
     type dateWithDay = {month:number, date:number, day:string, idx: number}
     let dateList: dateWithDay[];
+    let timeInfo = [dateIdx, hourIdx, minuteIdx, disabledDateIdx, disabledHourIdx, disabledMinuteIdx, isAfternoon];
     const hourList = [...Array(12).keys()].map((e)=>(e?e:12));
     const minuteList = [...Array(6).keys()].map((e)=>(e*10));
     const dayList = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일']
+    function compareTime(i: number|boolean, timeInfo: (number|boolean)[], type: number) {
+        let [dateIdx, hourIdx, minuteIdx, disabledDateIdx, disabledHourIdx, disabledMinuteIdx, isAfternoon] = timeInfo;
+        switch (type) {
+            case 0: dateIdx = i; break;
+            case 1: hourIdx = i; break;
+            case 2: minuteIdx = i; break;
+            case 3: hourIdx = Number(hourIdx==undefined?(key?11:0)+Number(isAfternoon)*12:hourIdx) + (Number(i) - Number(isAfternoon))*12; break;
+            default: break;
+        }
+        let startDateIdx = key ? disabledDateIdx : dateIdx;
+        let startHourIdx = key ? disabledHourIdx : hourIdx;
+        let startMinuteIdx = key ? disabledMinuteIdx : minuteIdx;
+        let endDateIdx = key ? dateIdx : disabledDateIdx;
+        let endHourIdx = key ? hourIdx : disabledHourIdx;
+        let endMinuteIdx = key ? minuteIdx : disabledMinuteIdx;
+        if (startDateIdx == undefined) {
+            startDateIdx = 0;
+        }
+        if (startHourIdx == undefined) {
+            startHourIdx = 0;
+        }
+        if (startMinuteIdx == undefined) {
+            startMinuteIdx = 0;
+        }
+        if (endDateIdx == undefined) {
+            endDateIdx = 15;
+        }
+        if (endHourIdx == undefined) {
+            endHourIdx = 23;
+        }
+        if (endMinuteIdx == undefined) {
+            endMinuteIdx = 5;
+        }
+        console.log(key, type, i, startDateIdx, startHourIdx, startMinuteIdx, endDateIdx, endHourIdx, endMinuteIdx);
+        console.log(startDateIdx < endDateIdx || (startDateIdx==endDateIdx && (startHourIdx < endHourIdx || (startHourIdx == endHourIdx && startMinuteIdx < endMinuteIdx))));
+        
+        return startDateIdx < endDateIdx || (startDateIdx==endDateIdx && (startHourIdx < endHourIdx || (startHourIdx == endHourIdx && startMinuteIdx < endMinuteIdx)));
+    }
+
+    $: console.log(isAfternoon);
     $: {
         if (now) {
             dateList = [...Array(16)].map((e, i)=> {
@@ -63,26 +102,15 @@
         }
     }
     $: {
-        if (disabledDateIdx > Number(dateIdx)) {
-            dateIdx = undefined;
-            hourIdx = undefined;
-            minuteIdx = undefined;
-        } else if (disabledDateIdx === Number(dateIdx)) {
-            if (disabledHourIdx > Number(hourIdx) || disabledHourIdx === Number(hourIdx) && Number(hourIdx)===disabledHourIdx&&disabledMinuteIdx===5) {
-                hourIdx = undefined;
-                minuteIdx = undefined;
-            } else if (disabledHourIdx === Number(hourIdx) && disabledMinuteIdx > Number(minuteIdx)) {
-                minuteIdx = undefined;
-            } 
-        }
+        timeInfo = [dateIdx, hourIdx, minuteIdx, disabledDateIdx, disabledHourIdx, disabledMinuteIdx, isAfternoon]
     }
 
 </script>
 
 <div class="middle">
     <div class="day" in:fly={{y: 10,duration: 100}} out:fly={{y: -10,duration: 100}}>
-        {#each fullDateList as {month, date, day, idx} (idx)}
-            <div in:receive={{key: idx}} out:send={{key: idx}} animate:flip={{duration: 600}}>
+        {#each fullDateList as {month, date, day, idx: i} (i)}
+            <div in:receive={{key: i}} out:send={{key: i}} animate:flip={{duration: 600}}>
                 {#if month===0}
                     <div>
                         <Card class="etc" ripple on:click={()=>{moreDays=true}} >
@@ -90,16 +118,16 @@
                         </Card>
                     </div>
                 {:else}
-                    <div class={`day-card ${idx < disabledDateIdx || (idx==disabledDateIdx && disabledHourIdx==23 && disabledMinuteIdx==5) ? 'disabled':''}`}>
-                        <Card primary={idx== dateIdx} ripple key={idx} on:click={()=>{dateIdx=idx; moreDays=false}}>
+                    <div class={`day-card ${compareTime(i, timeInfo, 0) ?'':'disabled'}`}>
+                        <Card primary={i== dateIdx} ripple key={i} on:click={()=>{dateIdx=i; moreDays=false}}>
                             <b class="day-text">{`${month}월 ${date}일`}</b>
                             <br />
                             {day}
                         </Card>
-                        {#if idx===0}
+                        {#if i===0}
                         <div class="dot">오늘</div>
                         {/if}
-                        {#if idx===1}
+                        {#if i===1}
                         <div class="dot">내일</div>
                         {/if}
                     </div>
@@ -111,15 +139,15 @@
     <div class="down-arrow" in:fly={{y: 10, duration: 100}} out:fly={{y: -10, duration: 100}}>▼</div>
     <div class="row" in:fly={{y: 10, duration: 100}} out:fly={{y: -10, duration: 100}}>
         <div class="switch-wrapper">
-            <input class='switch-input' type="checkbox" id={`switch-${key}`} value={isAfternoon} on:change={()=>{isAfternoon=!isAfternoon}}>
+            <input class='switch-input' type="checkbox" id={`switch-${key}`} value={isAfternoon} checked={isAfternoon} on:change={()=>{isAfternoon=!isAfternoon}}>
             <label for={`switch-${key}`} class="switch_label">
-                <div class="text">오전</div>
-                <div class="text">오후</div>
+                <div class={`text${compareTime(false, timeInfo, 3)?"":"-disabled"}`}>오전</div>
+                <div class={`text${compareTime(true, timeInfo, 3)?"":"-disabled"}`}>오후</div>
                 <span class="onf_btn"></span>
             </label>
         </div>
         {#each hourList as hour, i}
-            <div class={dateIdx==disabledDateIdx&&(i+Number(isAfternoon)*12<disabledHourIdx||i+Number(isAfternoon)*12==disabledHourIdx&&disabledMinuteIdx==5)?'disabled':''}>
+            <div class={compareTime(i+Number(isAfternoon)*12, timeInfo, 1)?'':'disabled'}>
                 <Card primary={i==hourIdx-Number(isAfternoon)*12} ripple key={i} on:click={()=>{hourIdx=i+Number(isAfternoon)*12}}>
                     {hour}시
                 </Card>
@@ -132,7 +160,7 @@
     <div  class="row" in:fly={{y: 10, duration: 100}} out:fly={{y: -10,duration: 100}}>
         <div></div>
         {#each minuteList as minute, i}
-            <div class={dateIdx==disabledDateIdx&&hourIdx==disabledHourIdx&&i<=disabledMinuteIdx?'disabled':''}>
+            <div class={compareTime(i, timeInfo, 2)?'':'disabled'}>
                 <Card primary={i==minuteIdx} ripple key={i} on:click={()=>{minuteIdx=i}}>
                     {minute}분
                 </Card>
@@ -183,7 +211,7 @@
 
     .disabled {
         color:#888;
-        pointer-events: none;
+        /* pointer-events: none; */
     }
 
     .switch-wrapper {
@@ -235,6 +263,21 @@
             &:nth-child(2) {
                 margin-top: 12px;
             }
+        }
+        .text-disabled {
+            position: relative;
+            height: calc(50% - 6px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            z-index: 1;
+            &:first-child {
+                margin-bottom: 6px;
+            }
+            &:nth-child(2) {
+                margin-top: 12px;
+            }
+            color: #aaa;
         }
 
         /* checking style */
