@@ -9,6 +9,12 @@
     let izel:number;
     let startDate:number, startHour:number, startMinute:number;
     let endDate:number, endHour:number, endMinute:number;
+    let timeInfo = [startDate, startHour, startMinute, endDate, endHour, endMinute];
+
+    function checkTime(timeInfo:number[]) {
+      [startDate, startHour, startMinute, endDate, endHour, endMinute] = timeInfo;
+      return startDate < endDate || (startDate==endDate && (startHour < endHour || (startHour == endHour && startMinute < endMinute)));
+    }
   
     $: progress = (step + 0.5) / 7;
     $: {
@@ -53,6 +59,8 @@
         $returnTime.minuteIdx=endMinute;
       }
     }
+    $: timeInfo = [startDate, startHour, startMinute, endDate, endHour, endMinute];
+
 </script>
 
 <Head title="이젤 대여" size={150}
@@ -64,7 +72,7 @@
     <h2>무슨 이젤을 빌릴까요?</h2>
     <div class="thing-list">
       {#each izels as {name}, i}
-      <Card on:click={()=>{izel = i}} key={i} primary={i== izel}>
+      <Card on:click={()=>{izel = i}} ripple key={i} primary={i== izel}>
         <div class="thing">
           <img 
             src="https://img.freepik.com/premium-vector/empty-canvas-on-wooden-easel-wooden-brown-easel_349999-1056.jpg"
@@ -83,6 +91,9 @@
       bind:dateIdx = {startDate}
       bind:hourIdx = {startHour}
       bind:minuteIdx = {startMinute}
+      disabledDateIdx = {endDate}
+      disabledHourIdx = {endHour}
+      disabledMinuteIdx = {endMinute}
       key={0}
     />
     {/if}
@@ -104,7 +115,14 @@
 </div>
 <div class="footer">
   <a href='/izel'><Button outlined>이전</Button></a>
-  <a href={step < 7? null:'/izel/reserve-end'}><Button primary disabled={step < 7}>대여 정보 입력</Button></a>
+  <div class="to-next">
+    {#if (step == 7 && !checkTime(timeInfo))}
+      <p class="warning">대여 종료 시간이 대여 시작 시간보다 빨라요.</p>
+    {/if}
+    <a href={step == 7 && checkTime(timeInfo)?'/izel/reserve-end':null}>
+      <Button primary disabled={step < 7 || !checkTime(timeInfo)}>대여 정보 입력</Button>
+    </a>
+  </div>
 </div>
 <style lang="scss">
   .content {
@@ -129,8 +147,17 @@
     }
   }
   .footer {
+    display: flex;
+    justify-content: space-between;
+    .to-next {
       display: flex;
-      justify-content: space-between;
+      gap: 1rem;
+      .warning {
+        margin-block-start: 0;
+        margin-block-end: 0;
+        align-self: center;
+      }
+    }
   }
   .thing-list {
     display: grid;
