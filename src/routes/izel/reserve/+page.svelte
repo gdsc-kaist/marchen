@@ -76,7 +76,7 @@
         <div class="thing">
           <img 
             src="https://img.freepik.com/premium-vector/empty-canvas-on-wooden-easel-wooden-brown-easel_349999-1056.jpg"
-            alt="test image"
+            alt="test"
           />
           <h3>{name}</h3>
         </div>

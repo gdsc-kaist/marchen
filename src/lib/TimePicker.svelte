@@ -1,6 +1,6 @@
 <script  lang="ts">
-    export let dateIdx:number, hourIdx:number, minuteIdx:number, key:number;
-    export let disabledDateIdx:number, disabledHourIdx:number, disabledMinuteIdx:number;
+    export let dateIdx:number|undefined, hourIdx:number|undefined, minuteIdx:number|undefined, key:number|undefined;
+    export let disabledDateIdx:number=-1, disabledHourIdx:number=-1 , disabledMinuteIdx:number=-1;
     import { fly, scale } from "svelte/transition";
     import {Input, Card, Button} from "nunui";
     import { flip } from 'svelte/animate';
@@ -89,10 +89,10 @@
             opened = true;
         } else {
             if (opened || fullDateList === undefined) {
-                if (dateIdx >= 3) {
+                if (dateIdx ? dateIdx : 0 >= 3) {
                     fullDateList = dateList.slice(0, 2);
                     fullDateList.push({month: 0, day: "", date: 0, idx: -1});
-                    fullDateList.push(dateList.at(dateIdx) as dateWithDay)
+                    fullDateList.push(dateList.at(dateIdx ? dateIdx : 0) as dateWithDay)
                 } else {
                     fullDateList = dateList.slice(0, 3);
                     fullDateList.push({month: 0, day: "", date: 0, idx: -1})
