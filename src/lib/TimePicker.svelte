@@ -1,5 +1,5 @@
 <script  lang="ts">
-    export let dateIdx:number, hourIdx:number, minuteIdx:number, key:number;
+    export let dateIdx:number|undefined, hourIdx:number|undefined, minuteIdx:number|undefined, key:number|undefined;
     export let disabledDateIdx:number=-1, disabledHourIdx:number=-1 , disabledMinuteIdx:number=-1;
     import { fly, scale } from "svelte/transition";
     import {Input, Card, Button} from "nunui";
@@ -62,6 +62,20 @@
             opened = false;
         }
     }
+    $: {
+        if (disabledDateIdx > Number(dateIdx)) {
+            dateIdx = undefined;
+            hourIdx = undefined;
+            minuteIdx = undefined;
+        } else if (disabledDateIdx === Number(dateIdx)) {
+            if (disabledHourIdx > Number(hourIdx) || disabledHourIdx === Number(hourIdx) && Number(hourIdx)===disabledHourIdx&&disabledMinuteIdx===5) {
+                hourIdx = undefined;
+                minuteIdx = undefined;
+            } else if (disabledHourIdx === Number(hourIdx) && disabledMinuteIdx > Number(minuteIdx)) {
+                minuteIdx = undefined;
+            } 
+        }
+    }
 
 </script>
 
@@ -105,7 +119,7 @@
             </label>
         </div>
         {#each hourList as hour, i}
-            <div class={dateIdx==disabledDateIdx&&(i<disabledHourIdx||i==disabledHourIdx&&disabledMinuteIdx==5)?'disabled':''}>
+            <div class={dateIdx==disabledDateIdx&&(i+Number(isAfternoon)*12<disabledHourIdx||i+Number(isAfternoon)*12==disabledHourIdx&&disabledMinuteIdx==5)?'disabled':''}>
                 <Card primary={i==hourIdx-Number(isAfternoon)*12} ripple key={i} on:click={()=>{hourIdx=i+Number(isAfternoon)*12}}>
                     {hour}시
                 </Card>
