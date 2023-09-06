@@ -10,6 +10,7 @@
     let startDate:number, startHour:number, startMinute:number;
     let endDate:number, endHour:number, endMinute:number;
     let timeInfo = [startDate, startHour, startMinute, endDate, endHour, endMinute];
+    let selected = 0;
 
     function checkTime(timeInfo:number[]) {
       [startDate, startHour, startMinute, endDate, endHour, endMinute] = timeInfo;
@@ -60,6 +61,15 @@
       }
     }
     $: timeInfo = [startDate, startHour, startMinute, endDate, endHour, endMinute];
+    $: {
+      startDate, startHour, startMinute;
+      selected = 0;
+    }
+    $: {
+      endDate, endHour, endMinute;
+      selected = 1;
+    }
+    $: console.log(selected);
 
 </script>
 
@@ -84,7 +94,10 @@
       {/each}
     </div>
   </div>
-  <div class="container">
+  <div class={(step == 7 && !checkTime(timeInfo) && selected == 0)?"container-warn":"container"}>
+    {#if (step == 7 && !checkTime(timeInfo) && selected == 0)}
+      <h3 class="warning">⚠️</h3>
+    {/if}
     <h2>언제부터 빌릴까요?</h2>
     {#if (step >= 1)}
     <TimePicker 
@@ -98,7 +111,10 @@
     />
     {/if}
   </div>
-  <div class="container">
+  <div class={(step == 7 && !checkTime(timeInfo) && selected == 1)?"container-warn":"container"}>
+    {#if (step == 7 && !checkTime(timeInfo) && selected == 1)}
+      <h3 class="warning">⚠️</h3>
+    {/if}
     <h2>언제까지 빌릴까요?</h2>
     {#if (step >= 4)}
     <TimePicker 
@@ -117,7 +133,7 @@
   <a href='/izel'><Button outlined>이전</Button></a>
   <div class="to-next">
     {#if (step == 7 && !checkTime(timeInfo))}
-      <p class="warning">대여 종료 시간이 대여 시작 시간보다 빨라요.</p>
+      <!-- <p class="warning">대여 종료 시간이 대여 시작 시간과 같거나 빨라요.</p> -->
     {/if}
     <a href={step == 7 && checkTime(timeInfo)?'/izel/reserve-end':null}>
       <Button primary disabled={step < 7 || !checkTime(timeInfo)}>대여 정보 입력</Button>
@@ -137,13 +153,45 @@
     }
   }
   .container {
+    position: relative;
     border-radius: 10px;
+    /* background-color: #ff000040; */
     box-shadow: 0 0 10px 0 #00000040;
     padding: 0.5rem;
     overflow: hidden;
     &:not(:first-child) {
       height: 400px;
       grid-column: span 2;
+    }
+    .warning {
+      position: absolute;
+      top: 0px;
+      left: 2rem;
+      /* padding: 4px; */
+      /* background-color: var(--primary); */
+      font-size: 25px;
+      color: #f00;
+    }
+  }
+  .container-warn {
+    position: relative;
+    border-radius: 10px;
+    /* background-color: #ff000040; */
+    box-shadow: 0 0 10px 0 #ff6c6c;
+    padding: 0.5rem;
+    overflow: hidden;
+    &:not(:first-child) {
+      height: 400px;
+      grid-column: span 2;
+    }
+    .warning {
+      position: absolute;
+      top: 0px;
+      left: 2rem;
+      /* padding: 4px; */
+      /* background-color: var(--primary); */
+      font-size: 25px;
+      color: #f00;
     }
   }
   .footer {

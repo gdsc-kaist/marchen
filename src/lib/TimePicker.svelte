@@ -15,44 +15,6 @@
     const hourList = [...Array(12).keys()].map((e)=>(e?e:12));
     const minuteList = [...Array(6).keys()].map((e)=>(e*10));
     const dayList = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일']
-    function compareTime(i: number|boolean, timeInfo: (number|boolean)[], type: number) {
-        let [dateIdx, hourIdx, minuteIdx, disabledDateIdx, disabledHourIdx, disabledMinuteIdx, isAfternoon] = timeInfo;
-        switch (type) {
-            case 0: dateIdx = i; break;
-            case 1: hourIdx = i; break;
-            case 2: minuteIdx = i; break;
-            case 3: hourIdx = Number(hourIdx==undefined?(key?11:0)+Number(isAfternoon)*12:hourIdx) + (Number(i) - Number(isAfternoon))*12; break;
-            default: break;
-        }
-        let startDateIdx = key ? disabledDateIdx : dateIdx;
-        let startHourIdx = key ? disabledHourIdx : hourIdx;
-        let startMinuteIdx = key ? disabledMinuteIdx : minuteIdx;
-        let endDateIdx = key ? dateIdx : disabledDateIdx;
-        let endHourIdx = key ? hourIdx : disabledHourIdx;
-        let endMinuteIdx = key ? minuteIdx : disabledMinuteIdx;
-        if (startDateIdx == undefined) {
-            startDateIdx = 0;
-        }
-        if (startHourIdx == undefined) {
-            startHourIdx = 0;
-        }
-        if (startMinuteIdx == undefined) {
-            startMinuteIdx = 0;
-        }
-        if (endDateIdx == undefined) {
-            endDateIdx = 15;
-        }
-        if (endHourIdx == undefined) {
-            endHourIdx = 23;
-        }
-        if (endMinuteIdx == undefined) {
-            endMinuteIdx = 5;
-        }
-        console.log(key, type, i, startDateIdx, startHourIdx, startMinuteIdx, endDateIdx, endHourIdx, endMinuteIdx);
-        console.log(startDateIdx < endDateIdx || (startDateIdx==endDateIdx && (startHourIdx < endHourIdx || (startHourIdx == endHourIdx && startMinuteIdx < endMinuteIdx))));
-        
-        return startDateIdx < endDateIdx || (startDateIdx==endDateIdx && (startHourIdx < endHourIdx || (startHourIdx == endHourIdx && startMinuteIdx < endMinuteIdx)));
-    }
 
     $: console.log(isAfternoon);
     $: {
@@ -118,7 +80,7 @@
                         </Card>
                     </div>
                 {:else}
-                    <div class={`day-card ${compareTime(i, timeInfo, 0) ?'':'disabled'}`}>
+                    <div class={`day-card`}>
                         <Card primary={i== dateIdx} ripple key={i} on:click={()=>{dateIdx=i; moreDays=false}}>
                             <b class="day-text">{`${month}월 ${date}일`}</b>
                             <br />
@@ -141,13 +103,13 @@
         <div class="switch-wrapper">
             <input class='switch-input' type="checkbox" id={`switch-${key}`} value={isAfternoon} checked={isAfternoon} on:change={()=>{isAfternoon=!isAfternoon}}>
             <label for={`switch-${key}`} class="switch_label">
-                <div class={`text${compareTime(false, timeInfo, 3)?"":"-disabled"}`}>오전</div>
-                <div class={`text${compareTime(true, timeInfo, 3)?"":"-disabled"}`}>오후</div>
+                <div class={`text`}>오전</div>
+                <div class={`text`}>오후</div>
                 <span class="onf_btn"></span>
             </label>
         </div>
         {#each hourList as hour, i}
-            <div class={compareTime(i+Number(isAfternoon)*12, timeInfo, 1)?'':'disabled'}>
+            <div>
                 <Card primary={i==hourIdx-Number(isAfternoon)*12} ripple key={i} on:click={()=>{hourIdx=i+Number(isAfternoon)*12}}>
                     {hour}시
                 </Card>
@@ -160,7 +122,7 @@
     <div  class="row" in:fly={{y: 10, duration: 100}} out:fly={{y: -10,duration: 100}}>
         <div></div>
         {#each minuteList as minute, i}
-            <div class={compareTime(i, timeInfo, 2)?'':'disabled'}>
+            <div>
                 <Card primary={i==minuteIdx} ripple key={i} on:click={()=>{minuteIdx=i}}>
                     {minute}분
                 </Card>
@@ -209,10 +171,6 @@
         color: #fff;
     }
 
-    .disabled {
-        color:#888;
-        /* pointer-events: none; */
-    }
 
     .switch-wrapper {
         margin: 6px 0;
