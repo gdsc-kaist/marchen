@@ -1,76 +1,42 @@
 <script lang="ts">
     import {Card, LinearProgress, Button} from "nunui";
-    import {fly} from "svelte/transition";
     import Head from "$lib/Head.svelte";
     import TimePicker from "$lib/TimePicker.svelte";
     import {izels, borrowTime, returnTime, izelIdx} from "$stores/reserve.js";
 
-    let step = 0;
-    let izel: number;
-    let startDate: number, startHour: number, startMinute: number;
-    let endDate: number, endHour: number, endMinute: number;
-    let timeInfo = [startDate, startHour, startMinute, endDate, endHour, endMinute];
-    let selected = 0;
+    let step = 0, selected = 0, izel = -1;
 
     function checkTime(timeInfo: number[]) {
-        [startDate, startHour, startMinute, endDate, endHour, endMinute] = timeInfo;
+        const [startDate, startHour, startMinute, endDate, endHour, endMinute] = timeInfo;
         return startDate < endDate || (startDate == endDate && (startHour < endHour || (startHour == endHour && startMinute < endMinute)));
     }
 
     $: progress = (step + 0.5) / 7;
-    $: {
-        if (izel !== undefined) {
-            step = Math.max(step, 1);
-            $izelIdx = izel;
-        }
+    $: if (izel !== -1) {
+        step = Math.max(step, 1);
+        $izelIdx = izel;
     }
+
+    $: if ($borrowTime.date >= 0) step = Math.max(step, 2);
+    $: if ($borrowTime.hour >= 0) step = Math.max(step, 3);
+    $: if ($borrowTime.minute >= 0) step = Math.max(step, 4);
+    $: if ($returnTime.date >= 0) step = Math.max(step, 5);
+    $: if ($returnTime.hour >= 0) step = Math.max(step, 6);
+    $: if ($returnTime.minute >= 0) step = Math.max(step, 7);
+
+    $: timeInfo = [$borrowTime.date, $borrowTime.hour, $borrowTime.minute, $returnTime.date, $returnTime.hour, $returnTime.minute];
+
     $: {
-        if (startDate !== undefined) {
-            step = Math.max(step, 2);
-            $borrowTime.dateIdx = startDate;
-        }
-    }
-    $: {
-        if (startHour !== undefined) {
-            step = Math.max(step, 3);
-            $borrowTime.hourIdx = startHour;
-        }
-    }
-    $: {
-        if (startMinute !== undefined) {
-            step = Math.max(step, 4);
-            $borrowTime.minuteIdx = startMinute;
-        }
-    }
-    $: {
-        if (endDate !== undefined) {
-            step = Math.max(step, 5);
-            $returnTime.dateIdx = endDate;
-        }
-    }
-    $: {
-        if (endHour !== undefined) {
-            step = Math.max(step, 6);
-            $returnTime.hourIdx = endHour;
-        }
-    }
-    $: {
-        if (endMinute !== undefined) {
-            step = Math.max(step, 7);
-            $returnTime.minuteIdx = endMinute;
-        }
-    }
-    $: timeInfo = [startDate, startHour, startMinute, endDate, endHour, endMinute];
-    $: {
-        startDate, startHour, startMinute;
+        void $borrowTime;
         selected = 0;
     }
     $: {
-        endDate, endHour, endMinute;
+        void $returnTime;
         selected = 1;
     }
-    $: console.log(selected);
 
+    $: warnTimeFrom = step === 7 && !checkTime(timeInfo) && selected === 0;
+    $: warnTimeTo = step === 7 && !checkTime(timeInfo) && selected === 1;
 </script>
 
 <Head title="이젤 대여" size={150}
@@ -82,50 +48,32 @@
         <h2>무슨 이젤을 빌릴까요?</h2>
         <div class="thing-list">
             {#each izels as {name}, i}
-                <Card on:click={()=>{izel = i}} ripple key={i} primary={i== izel}>
+                <Card on:click={() => izel = i} ripple primary={i === izel}>
                     <div class="thing">
-                        <img
-                                src="https://img.freepik.com/premium-vector/empty-canvas-on-wooden-easel-wooden-brown-easel_349999-1056.jpg"
-                                alt="test image"
-                        />
+                        <img src="https://img.freepik.com/premium-vector/empty-canvas-on-wooden-easel-wooden-brown-easel_349999-1056.jpg"
+                             alt="test image"/>
                         <h3>{name}</h3>
                     </div>
                 </Card>
             {/each}
         </div>
     </div>
-    <div class={(step == 7 && !checkTime(timeInfo) && selected == 0)?"container-warn":"container"} class:hover={1 <= step && step <= 3}>
-        {#if (step == 7 && !checkTime(timeInfo) && selected == 0)}
+    <div class="container" class:warn={warnTimeFrom} class:hover={1 <= step && step <= 3}>
+        {#if warnTimeFrom}
             <h3 class="warning">⚠️</h3>
         {/if}
         <h2>언제부터 빌릴까요?</h2>
-        {#if (step >= 1)}
-            <TimePicker
-                    bind:dateIdx={startDate}
-                    bind:hourIdx={startHour}
-                    bind:minuteIdx={startMinute}
-                    disabledDateIdx={endDate}
-                    disabledHourIdx={endHour}
-                    disabledMinuteIdx={endMinute}
-                    key={0}
-            />
+        {#if step >= 1}
+            <TimePicker bind:time={$borrowTime}/>
         {/if}
     </div>
-    <div class={(step == 7 && !checkTime(timeInfo) && selected == 1)?"container-warn":"container"} class:hover={4 <= step && step <= 6}>
-        {#if (step == 7 && !checkTime(timeInfo) && selected == 1)}
+    <div class="container" class:warn={warnTimeTo} class:hover={4 <= step && step <= 6}>
+        {#if warnTimeTo}
             <h3 class="warning">⚠️</h3>
         {/if}
         <h2>언제까지 빌릴까요?</h2>
-        {#if (step >= 4)}
-            <TimePicker
-                    bind:dateIdx={endDate}
-                    bind:hourIdx={endHour}
-                    bind:minuteIdx={endMinute}
-                    disabledDateIdx={startDate}
-                    disabledHourIdx={startHour}
-                    disabledMinuteIdx={startMinute}
-                    key={1}
-            />
+        {#if step >= 4}
+            <TimePicker bind:time={$returnTime}/>
         {/if}
     </div>
 </div>
@@ -134,14 +82,15 @@
         <Button outlined>이전</Button>
     </a>
     <div class="to-next">
-        {#if (step == 7 && !checkTime(timeInfo))}
+        {#if step === 7 && !checkTime(timeInfo)}
             <!-- <p class="warning">대여 종료 시간이 대여 시작 시간과 같거나 빨라요.</p> -->
         {/if}
-        <a href={step == 7 && checkTime(timeInfo)?'/izel/reserve-end':null}>
+        <a href={step === 7 && checkTime(timeInfo) ? '/izel/reserve-end' : null}>
             <Button primary disabled={step < 7 || !checkTime(timeInfo)}>대여 정보 입력</Button>
         </a>
     </div>
 </div>
+
 <style lang="scss">
   .content {
     display: grid;
@@ -174,39 +123,18 @@
       position: absolute;
       top: 0px;
       left: 2rem;
-      /* padding: 4px; */
-      /* background-color: var(--primary); */
       font-size: 25px;
       color: #f00;
+    }
+
+    &.warn {
+      border: 1px solid #ff6c6c;
+      box-shadow: 0 0 16px 0 #ff6c6c44;
     }
 
     &.hover {
       border: none;
       box-shadow: 0 0 16px 0 #00000020;
-    }
-  }
-
-  .container-warn {
-    position: relative;
-    border-radius: 10px;
-    /* background-color: #ff000040; */
-    box-shadow: 0 0 10px 0 #ff6c6c;
-    padding: 0.5rem;
-    overflow: hidden;
-
-    &:not(:first-child) {
-      height: 400px;
-      grid-column: span 2;
-    }
-
-    .warning {
-      position: absolute;
-      top: 0px;
-      left: 2rem;
-      /* padding: 4px; */
-      /* background-color: var(--primary); */
-      font-size: 25px;
-      color: #f00;
     }
   }
 

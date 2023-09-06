@@ -1,4 +1,4 @@
-import { writable, derived } from 'svelte/store';
+import {writable, derived} from 'svelte/store';
 
 export const izels = [
     {name: '나무 이젤'},
@@ -14,18 +14,14 @@ export const borrowerName = writable("");
 export const rentalReason = writable("");
 
 export const izelIdx = writable(0);
-export const izelName = derived(izelIdx, ($izelIdx)=>(`이젤/${izels[$izelIdx].name}`));
+export const izelName = derived(izelIdx, ($izelIdx) => (`이젤/${izels[$izelIdx].name}`));
 
 export const borrowTime = writable({
-    dateIdx: 0,
-    hourIdx: 0,
-    minuteIdx: 0,
+    date: -1, hour: -1, minute: -1
 });
 
 export const returnTime = writable({
-    dateIdx: 0,
-    hourIdx: 0,
-    minuteIdx: 0,
+    date: -1, hour: -1, minute: -1
 });
 
 export const borrowTimeString = derived(borrowTime, ($borrowTime) => (timeToString($borrowTime)));
@@ -33,9 +29,9 @@ export const returnTimeString = derived(returnTime, ($returnTime) => (timeToStri
 
 const now = new Date();
 
-const timeToString = ({dateIdx, hourIdx, minuteIdx}:{dateIdx:number, hourIdx:number, minuteIdx:number}) => {
-    const tempDate = new Date(now.setDate(now.getDate()+dateIdx));
-    const month = tempDate.getMonth()+1;
-    const date = tempDate.getDate();
-    return `${month}월 ${date}일 ${hourIdx<12 ? '오전': '오후'} ${hourIdx%12 ? hourIdx%12:12}시 ${minuteIdx*10}분`
+const timeToString = ({date, hour, minute}: { date: number, hour: number, minute: number }) => {
+    const tempDate = new Date(now.setDate(now.getDate() + date));
+    const month = tempDate.getMonth() + 1;
+    const tdate = tempDate.getDate();
+    return `${month}월 ${tdate}일 ${hour < 12 ? '오전' : '오후'} ${hour % 12 ? hour % 12 : 12}시 ${minute * 10}분`
 } 
