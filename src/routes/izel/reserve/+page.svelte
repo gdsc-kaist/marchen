@@ -6,68 +6,68 @@
     import {izels, borrowTime, returnTime, izelIdx} from "$stores/reserve.js";
 
     let step = 0;
-    let izel:number;
-    let startDate:number, startHour:number, startMinute:number;
-    let endDate:number, endHour:number, endMinute:number;
+    let izel: number;
+    let startDate: number, startHour: number, startMinute: number;
+    let endDate: number, endHour: number, endMinute: number;
     let timeInfo = [startDate, startHour, startMinute, endDate, endHour, endMinute];
     let selected = 0;
 
-    function checkTime(timeInfo:number[]) {
-      [startDate, startHour, startMinute, endDate, endHour, endMinute] = timeInfo;
-      return startDate < endDate || (startDate==endDate && (startHour < endHour || (startHour == endHour && startMinute < endMinute)));
+    function checkTime(timeInfo: number[]) {
+        [startDate, startHour, startMinute, endDate, endHour, endMinute] = timeInfo;
+        return startDate < endDate || (startDate == endDate && (startHour < endHour || (startHour == endHour && startMinute < endMinute)));
     }
-  
+
     $: progress = (step + 0.5) / 7;
     $: {
-      if (izel !== undefined) {
-        step = Math.max(step, 1);
-        $izelIdx = izel;
-      }
+        if (izel !== undefined) {
+            step = Math.max(step, 1);
+            $izelIdx = izel;
+        }
     }
     $: {
-      if (startDate !== undefined) {
-        step = Math.max(step, 2);
-        $borrowTime.dateIdx=startDate;
-      }
+        if (startDate !== undefined) {
+            step = Math.max(step, 2);
+            $borrowTime.dateIdx = startDate;
+        }
     }
     $: {
-      if (startHour !== undefined) {
-        step = Math.max(step, 3);
-        $borrowTime.hourIdx=startHour;
-      }
+        if (startHour !== undefined) {
+            step = Math.max(step, 3);
+            $borrowTime.hourIdx = startHour;
+        }
     }
     $: {
-      if (startMinute !== undefined) {
-        step = Math.max(step, 4);
-        $borrowTime.minuteIdx=startMinute;
-      }
+        if (startMinute !== undefined) {
+            step = Math.max(step, 4);
+            $borrowTime.minuteIdx = startMinute;
+        }
     }
     $: {
-      if (endDate !== undefined) {
-        step = Math.max(step, 5);
-        $returnTime.dateIdx=endDate;
-      }
+        if (endDate !== undefined) {
+            step = Math.max(step, 5);
+            $returnTime.dateIdx = endDate;
+        }
     }
     $: {
-      if (endHour !== undefined) {
-        step = Math.max(step, 6);
-        $returnTime.hourIdx=endHour;
-      }
+        if (endHour !== undefined) {
+            step = Math.max(step, 6);
+            $returnTime.hourIdx = endHour;
+        }
     }
     $: {
-      if (endMinute !== undefined) {
-        step = Math.max(step, 7);
-        $returnTime.minuteIdx=endMinute;
-      }
+        if (endMinute !== undefined) {
+            step = Math.max(step, 7);
+            $returnTime.minuteIdx = endMinute;
+        }
     }
     $: timeInfo = [startDate, startHour, startMinute, endDate, endHour, endMinute];
     $: {
-      startDate, startHour, startMinute;
-      selected = 0;
+        startDate, startHour, startMinute;
+        selected = 0;
     }
     $: {
-      endDate, endHour, endMinute;
-      selected = 1;
+        endDate, endHour, endMinute;
+        selected = 1;
     }
     $: console.log(selected);
 
@@ -78,67 +78,69 @@
 
 <LinearProgress {progress}/>
 <div class="content">
-  <div class="container">
-    <h2>무슨 이젤을 빌릴까요?</h2>
-    <div class="thing-list">
-      {#each izels as {name}, i}
-      <Card on:click={()=>{izel = i}} ripple key={i} primary={i== izel}>
-        <div class="thing">
-          <img 
-            src="https://img.freepik.com/premium-vector/empty-canvas-on-wooden-easel-wooden-brown-easel_349999-1056.jpg"
-            alt="test image"
-          />
-          <h3>{name}</h3>
+    <div class="container" class:hover={0 === step}>
+        <h2>무슨 이젤을 빌릴까요?</h2>
+        <div class="thing-list">
+            {#each izels as {name}, i}
+                <Card on:click={()=>{izel = i}} ripple key={i} primary={i== izel}>
+                    <div class="thing">
+                        <img
+                                src="https://img.freepik.com/premium-vector/empty-canvas-on-wooden-easel-wooden-brown-easel_349999-1056.jpg"
+                                alt="test image"
+                        />
+                        <h3>{name}</h3>
+                    </div>
+                </Card>
+            {/each}
         </div>
-      </Card>
-      {/each}
     </div>
-  </div>
-  <div class={(step == 7 && !checkTime(timeInfo) && selected == 0)?"container-warn":"container"}>
-    {#if (step == 7 && !checkTime(timeInfo) && selected == 0)}
-      <h3 class="warning">⚠️</h3>
-    {/if}
-    <h2>언제부터 빌릴까요?</h2>
-    {#if (step >= 1)}
-    <TimePicker 
-      bind:dateIdx = {startDate}
-      bind:hourIdx = {startHour}
-      bind:minuteIdx = {startMinute}
-      disabledDateIdx = {endDate}
-      disabledHourIdx = {endHour}
-      disabledMinuteIdx = {endMinute}
-      key={0}
-    />
-    {/if}
-  </div>
-  <div class={(step == 7 && !checkTime(timeInfo) && selected == 1)?"container-warn":"container"}>
-    {#if (step == 7 && !checkTime(timeInfo) && selected == 1)}
-      <h3 class="warning">⚠️</h3>
-    {/if}
-    <h2>언제까지 빌릴까요?</h2>
-    {#if (step >= 4)}
-    <TimePicker 
-      bind:dateIdx = {endDate}
-      bind:hourIdx = {endHour}
-      bind:minuteIdx = {endMinute}
-      disabledDateIdx = {startDate}
-      disabledHourIdx = {startHour}
-      disabledMinuteIdx = {startMinute}
-      key={1}
-    />
-    {/if}
-  </div>
+    <div class={(step == 7 && !checkTime(timeInfo) && selected == 0)?"container-warn":"container"} class:hover={1 <= step && step <= 3}>
+        {#if (step == 7 && !checkTime(timeInfo) && selected == 0)}
+            <h3 class="warning">⚠️</h3>
+        {/if}
+        <h2>언제부터 빌릴까요?</h2>
+        {#if (step >= 1)}
+            <TimePicker
+                    bind:dateIdx={startDate}
+                    bind:hourIdx={startHour}
+                    bind:minuteIdx={startMinute}
+                    disabledDateIdx={endDate}
+                    disabledHourIdx={endHour}
+                    disabledMinuteIdx={endMinute}
+                    key={0}
+            />
+        {/if}
+    </div>
+    <div class={(step == 7 && !checkTime(timeInfo) && selected == 1)?"container-warn":"container"} class:hover={4 <= step && step <= 6}>
+        {#if (step == 7 && !checkTime(timeInfo) && selected == 1)}
+            <h3 class="warning">⚠️</h3>
+        {/if}
+        <h2>언제까지 빌릴까요?</h2>
+        {#if (step >= 4)}
+            <TimePicker
+                    bind:dateIdx={endDate}
+                    bind:hourIdx={endHour}
+                    bind:minuteIdx={endMinute}
+                    disabledDateIdx={startDate}
+                    disabledHourIdx={startHour}
+                    disabledMinuteIdx={startMinute}
+                    key={1}
+            />
+        {/if}
+    </div>
 </div>
 <div class="footer">
-  <a href='/izel'><Button outlined>이전</Button></a>
-  <div class="to-next">
-    {#if (step == 7 && !checkTime(timeInfo))}
-      <!-- <p class="warning">대여 종료 시간이 대여 시작 시간과 같거나 빨라요.</p> -->
-    {/if}
-    <a href={step == 7 && checkTime(timeInfo)?'/izel/reserve-end':null}>
-      <Button primary disabled={step < 7 || !checkTime(timeInfo)}>대여 정보 입력</Button>
+    <a href='/izel'>
+        <Button outlined>이전</Button>
     </a>
-  </div>
+    <div class="to-next">
+        {#if (step == 7 && !checkTime(timeInfo))}
+            <!-- <p class="warning">대여 종료 시간이 대여 시작 시간과 같거나 빨라요.</p> -->
+        {/if}
+        <a href={step == 7 && checkTime(timeInfo)?'/izel/reserve-end':null}>
+            <Button primary disabled={step < 7 || !checkTime(timeInfo)}>대여 정보 입력</Button>
+        </a>
+    </div>
 </div>
 <style lang="scss">
   .content {
@@ -147,22 +149,27 @@
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     padding: 0.5rem;
     user-select: none;
+
     h2 {
       text-align: center;
       margin-bottom: 1rem;
     }
   }
+
   .container {
     position: relative;
     border-radius: 10px;
     /* background-color: #ff000040; */
-    box-shadow: 0 0 10px 0 #00000040;
     padding: 0.5rem;
     overflow: hidden;
+    transition: all 0.3s ease-in-out;
+    border: 1px solid var(--primary-light2);
+
     &:not(:first-child) {
       height: 400px;
       grid-column: span 2;
     }
+
     .warning {
       position: absolute;
       top: 0px;
@@ -172,7 +179,13 @@
       font-size: 25px;
       color: #f00;
     }
+
+    &.hover {
+      border: none;
+      box-shadow: 0 0 16px 0 #00000020;
+    }
   }
+
   .container-warn {
     position: relative;
     border-radius: 10px;
@@ -180,10 +193,12 @@
     box-shadow: 0 0 10px 0 #ff6c6c;
     padding: 0.5rem;
     overflow: hidden;
+
     &:not(:first-child) {
       height: 400px;
       grid-column: span 2;
     }
+
     .warning {
       position: absolute;
       top: 0px;
@@ -194,12 +209,15 @@
       color: #f00;
     }
   }
+
   .footer {
     display: flex;
     justify-content: space-between;
+
     .to-next {
       display: flex;
       gap: 1rem;
+
       .warning {
         margin-block-start: 0;
         margin-block-end: 0;
@@ -207,23 +225,28 @@
       }
     }
   }
+
   .thing-list {
     display: grid;
     gap: 16px;
     width: 100%;
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+
     .thing {
       display: grid;
       gap: 10px;
       grid-template-columns: 100px 1fr;
       grid-template-rows: 1fr 40px;
-      >*:first-child {
+
+      > *:first-child {
         grid-column: 1 / 2;
         grid-row: 1 / 3
       }
+
       h3 {
         margin: 0.7em 0;
       }
+
       img {
         height: 100px;
         width: 100px;
