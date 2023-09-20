@@ -10,7 +10,7 @@
     let primary, secondary, surface, onSurface, onSecondary;
     $: {
         if ($darkMode) {
-            [primary, secondary, surface, onSurface, onSecondary] = ["#595da7", "#464186", "#1e202a", "#fff", "#fff"];
+            [primary, secondary, surface, onSurface, onSecondary] = ["#5256a4", "#464186", "#1e202a", "#fff", "#fff"];
         } else {
             [primary, secondary, surface, onSurface, onSecondary] = ["#2c2963", "#514daf", "#eff2f6", "#13131f", "#13131f"];
         }
@@ -58,7 +58,29 @@
 
       div {
         padding: 12px;
+
+        & > :global(main) {
+          animation: fade 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+          padding: 0 12px;
+        }
       }
+    }
+  }
+
+  @keyframes fade {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  :global {
+    h1 {
+      font-weight: 400;
+      margin: 0.6em 0 0.3em 0
     }
   }
 </style>

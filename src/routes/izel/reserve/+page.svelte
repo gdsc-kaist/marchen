@@ -43,53 +43,55 @@
       img="https://images.unsplash.com/photo-1595378426340-19a317b875e3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1365&q=80"/>
 
 <LinearProgress {progress}/>
-<div class="content">
-    <div class="container" class:hover={0 === step}>
-        <h2>무슨 이젤을 빌릴까요?</h2>
-        <div class="thing-list">
-            {#each izels as {name}, i}
-                <Card on:click={() => izel = i} ripple primary={i === izel}>
-                    <div class="thing">
-                        <img src="https://img.freepik.com/premium-vector/empty-canvas-on-wooden-easel-wooden-brown-easel_349999-1056.jpg"
-                             alt="test image"/>
-                        <h3>{name}</h3>
-                    </div>
-                </Card>
-            {/each}
+<main>
+    <div class="content">
+        <div class="container" class:hover={0 === step}>
+            <h2>무슨 이젤을 빌릴까요?</h2>
+            <div class="thing-list">
+                {#each izels as {name}, i}
+                    <Card on:click={() => izel = i} ripple primary={i === izel}>
+                        <div class="thing">
+                            <img src="https://img.freepik.com/premium-vector/empty-canvas-on-wooden-easel-wooden-brown-easel_349999-1056.jpg"
+                                 alt="test image"/>
+                            <h3>{name}</h3>
+                        </div>
+                    </Card>
+                {/each}
+            </div>
+        </div>
+        <div class="container" class:warn={warnTimeFrom} class:hover={1 <= step && step <= 3}>
+            {#if warnTimeFrom}
+                <h3 class="warning">⚠️</h3>
+            {/if}
+            <h2>언제부터 빌릴까요?</h2>
+            {#if step >= 1}
+                <TimePicker bind:time={$borrowTime}/>
+            {/if}
+        </div>
+        <div class="container" class:warn={warnTimeTo} class:hover={4 <= step && step <= 6}>
+            {#if warnTimeTo}
+                <h3 class="warning">⚠️</h3>
+            {/if}
+            <h2>언제까지 빌릴까요?</h2>
+            {#if step >= 4}
+                <TimePicker bind:time={$returnTime}/>
+            {/if}
         </div>
     </div>
-    <div class="container" class:warn={warnTimeFrom} class:hover={1 <= step && step <= 3}>
-        {#if warnTimeFrom}
-            <h3 class="warning">⚠️</h3>
-        {/if}
-        <h2>언제부터 빌릴까요?</h2>
-        {#if step >= 1}
-            <TimePicker bind:time={$borrowTime}/>
-        {/if}
-    </div>
-    <div class="container" class:warn={warnTimeTo} class:hover={4 <= step && step <= 6}>
-        {#if warnTimeTo}
-            <h3 class="warning">⚠️</h3>
-        {/if}
-        <h2>언제까지 빌릴까요?</h2>
-        {#if step >= 4}
-            <TimePicker bind:time={$returnTime}/>
-        {/if}
-    </div>
-</div>
-<div class="footer">
-    <a href='/izel'>
-        <Button outlined>이전</Button>
-    </a>
-    <div class="to-next">
-        {#if step === 7 && !checkTime(timeInfo)}
-            <!-- <p class="warning">대여 종료 시간이 대여 시작 시간과 같거나 빨라요.</p> -->
-        {/if}
-        <a href={step === 7 && checkTime(timeInfo) ? '/izel/reserve-end' : null}>
-            <Button primary disabled={step < 7 || !checkTime(timeInfo)}>대여 정보 입력</Button>
+    <div class="footer">
+        <a href='/izel'>
+            <Button outlined>이전</Button>
         </a>
+        <div class="to-next">
+            {#if step === 7 && !checkTime(timeInfo)}
+                <!-- <p class="warning">대여 종료 시간이 대여 시작 시간과 같거나 빨라요.</p> -->
+            {/if}
+            <a href={step === 7 && checkTime(timeInfo) ? '/izel/reserve-end' : null}>
+                <Button primary disabled={step < 7 || !checkTime(timeInfo)}>대여 정보 입력</Button>
+            </a>
+        </div>
     </div>
-</div>
+</main>
 
 <style lang="scss">
   .content {

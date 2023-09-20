@@ -1,18 +1,18 @@
 <script lang="ts">
     import {leftNav, pageScroll} from "$stores/ui";
 
-    export let img = '', title = '', size = 400;
+    export let img = '', title = '', size = 200;
 
     $: mx = +size + ($leftNav ? -36 : -100);
 </script>
 
-<main style:background-image="url('{img}')" style:height="{size}px" style:--top="{Math.min($pageScroll, mx) / 2 - 20}px"
+<div style:background-image="url('{img}')" style:height="{size}px" style:--top="{Math.min($pageScroll, mx) / 2 - 20}px"
       style:--mx="-{mx}px" class:top={!$leftNav}>
     <h1>{title}</h1>
-</main>
+</div>
 
 <style lang="scss">
-  main {
+  div {
     margin: 0 0 12px 0;
     padding: 24px;
     width: calc(100% - 48px);

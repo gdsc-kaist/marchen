@@ -14,19 +14,19 @@
             path: "/"
         },
         {
-            icon: "filter_frames",
-            text: "이젤",
+            icon: "info",
+            text: "총람",
+            path: "/circle",
+        },
+        {
+            icon: "volunteer_activism",
+            text: "예약",
             path: "/izel",
         },
         {
-            icon: "search",
-            text: "테스트",
-            path: "/test",
-            extra: [
-                {icon: "looks_one", text: "통계1", path: "/crm-board/statistics/1"},
-                {icon: "looks_two", text: "통계2", path: "/crm-board/statistics/2"},
-                {icon: "looks_3", text: "통계3", path: "/crm-board/statistics/3"},
-            ]
+            icon: "playing_cards",
+            text: "경고",
+            path: "/penalty",
         },
         {
             icon: {auto: 'autopay', light: 'light_mode', dark: 'dark_mode'}[$theme],
