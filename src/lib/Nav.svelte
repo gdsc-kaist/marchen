@@ -19,6 +19,11 @@
             path: "/circle",
         },
         {
+            icon: "stadium",
+            text: "활동 내역",
+            path: "/activity",
+        },
+        {
             icon: "volunteer_activism",
             text: "예약",
             path: "/izel",
