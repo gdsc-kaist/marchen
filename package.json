@@ -32,6 +32,7 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"nunui": "^0.0.97"
+		"@seorii/tiptap": "^0.2.7",
+		"nunui": "^0.0.102"
 	}
 }
