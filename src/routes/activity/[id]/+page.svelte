@@ -1,71 +1,70 @@
 <script lang="ts">
+	import { getIdData } from "$utils/getActivityData";
 	import { Button } from "nunui";
-    const data = {
-        title: '활동보고서 이름',
-        classification: '합치하는 외부 활동',
-        date:'2023-09-20',
-        location: '동아리방',
-        memberNum: 5,
-        members: ['이서현', '강우성', '류수현', '박도윤', '조유진'],
-        purpose: '활동 목적에 대한 설명 입니다. 활동 목적에 대한 설명 입니다. 활동 목적에 대한 설명 입니다. 활동 목적에 대한 설명 입니다. 활동 목적에 대한 설명 입니다. 활동 목적에 대한 설명 입니다. 활동 목적에 대한 설명 입니다. 활동 목적에 대한 설명 입니다. 활동 목적에 대한 설명 입니다. 활동 목적에 대한 설명 입니다. 활동 목적에 대한 설명 입니다. ',
-        content: '이런 저런 일을 했습니다. 이런 저런 일을 했습니다. 이런 저런 일을 했습니다. 이런 저런 일을 했습니다. 이런 저런 일을 했습니다. 이런 저런 일을 했습니다. 이런 저런 일을 했습니다. 이런 저런 일을 했습니다. 이런 저런 일을 했습니다. 이런 저런 일을 했습니다. 이런 저런 일을 했습니다. 이런 저런 일을 했습니다. 이런 저런 일을 했습니다. 이런 저런 일을 했습니다. ',
-        images: [
-            {
-                url: "https://images.unsplash.com/photo-1548705085-101177834f47?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTV8fHRvZ2V0aGVyfGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60",
-                desc: '활동 인원 전원이 나온 사진 입니다.'
-            },
-            {
-                url: "https://images.unsplash.com/photo-1548705085-101177834f47?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTV8fHRvZ2V0aGVyfGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60",
-                desc: '활동 중인 사진 입니다.'
-            },
-            {
-                url: "https://images.unsplash.com/photo-1548705085-101177834f47?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTV8fHRvZ2V0aGVyfGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60",
-                desc: '활동 중인 추가 사진 입니다'
-            }
-        ]
-    }
+	import { onMount } from "svelte";
+
+    export let data;
+    let isMounted = false
+    onMount(async () => {
+        activityData = await getIdData(data.id);
+        isMounted = true
+    })
+
+    let activityData = {
+        id: null,
+        title: null,
+        classification:null,
+        date:null,
+        location: null,
+        memberNum: 0,
+        members: [],
+        purpose: null,
+        content: null,
+        images: []
+    };
 </script>
+{#if isMounted}
 <div class="activity">
     <div class="activity-desc">
         <h3>활동 보고서</h3>
         <table>
             <tr>
                 <th>활동명</th>
-                <td>{data.title}</td>
+                <td>{activityData.title}</td>
             </tr>
             <tr>
                 <th>공식분류</th>
-                <td>{data.classification}</td>
+                <td>{activityData.classification}</td>
             </tr>
             <tr>
                 <th>일시</th>
-                <td>{data.date}</td>
+                <td>{activityData.date}</td>
             </tr>
             <tr>
                 <th>장소</th>
-                <td>{data.location}</td>
+                <td>{activityData.location}</td>
             </tr>
             <tr>
                 <th>참여회원수</th>
-                <td>{data.memberNum}</td>
+                <td>{activityData.memberNum}</td>
             </tr>
             <tr>
                 <th>참여 인원 (명단)</th>
-                <td>{data.members.join(', ')}</td>
+                <td>{activityData.members.join(', ')}</td>
             </tr>
             <tr>
                 <th>활동 목적</th>
-                <td>{data.purpose}</td>
+                <td>{activityData.purpose}</td>
             </tr>
             <tr>
                 <th>활동 내용</th>
-                <td>{data.content}</td>
+                <td>{activityData.content}</td>
             </tr>
         </table>
     </div>
     <div class="activity-evidence">
         <h3>활동 증빙</h3>
-        {#each data.images as {url, desc}, i}
+        {#each activityData.images as {url, desc}, i}
         <div key={i} class="image">
             <img
                 src={url}
@@ -81,6 +80,12 @@
     </a>
     <Button>보고서 수정하기</Button>
 </div>
+{/if}
+{#if !isMounted}
+<div>
+    Loading...
+</div>
+{/if}
 
 <style lang="scss">
 @media (max-width: 800px) {
