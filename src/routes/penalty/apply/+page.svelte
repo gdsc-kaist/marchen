@@ -15,9 +15,6 @@
     const submit = () => api('/penalty', {reason, circle: selected}).then(() => goto('/penalty'))
 </script>
 
-<Head title="경고/부여"
-      img="https://images.unsplash.com/photo-1532382147828-96bdb28b7b04?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2940&q=80"/>
-
 <main>
     <Form bind:curr on:submit={submit}>
         <div>

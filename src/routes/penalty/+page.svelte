@@ -8,9 +8,6 @@
     import Circle from "$ui/Circle.svelte";
 </script>
 
-<Head title="경고"
-      img="https://images.unsplash.com/photo-1586201687415-f89f8bd2ab38?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2940&q=80"/>
-
 <main>
     <a href="/penalty/apply">부여</a>
     <h1>내 동아리</h1>
