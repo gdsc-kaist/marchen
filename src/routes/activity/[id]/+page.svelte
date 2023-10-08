@@ -10,18 +10,7 @@
         isMounted = true
     })
 
-    let activityData = {
-        id: null,
-        title: null,
-        classification:null,
-        date:null,
-        location: null,
-        memberNum: 0,
-        members: [],
-        purpose: null,
-        content: null,
-        images: []
-    };
+    let activityData = null
 </script>
 {#if isMounted}
 <div class="activity">

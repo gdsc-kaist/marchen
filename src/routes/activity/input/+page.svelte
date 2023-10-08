@@ -17,6 +17,10 @@
         content: string, 
         images: imageType[],
     }
+    interface warningType {
+        message: string,
+        detail?: warningType[]| null,
+    }
 
     let now = new Date();
 
@@ -35,6 +39,64 @@
         content: '',
         images: []
     }
+
+    let evidenceToggleId = -1;
+
+    const evidenceWarning: warningType[] = [
+        {
+            message: '사진',
+            detail: [
+                { message: '사진으로 해당 활동을 명확히 확인할 수 있어야 함'},
+                { message: '얼굴을 식별할 수 있는 경우만 사진에 나온 인원 수에 포함'},
+                { message: '외부인이 포함되어 있을 경우, 정회원을 표시해야 함'},
+                { message: '활동 당시의 사진이어야 함'},
+            ]
+        },
+        {
+            message: '공식 홍보 자료',
+            detail: [
+                { message: '공지된 내용으로 동아리를 특정할 수 있어야 함'},
+                { message: '홍보 자료에 해당 활동의 날짜, 장소가 포함되어 있어야 함'},
+                { 
+                    message: '전체 공개된 홍보물이어야 함',
+                    detail: [
+                        {
+                            message: 'Facebook 페이지 등 인터넷에 올린 경우',
+                            detail: [
+                                { message: '전체 공개 게시물이여야 함' },
+                                { message: '게시 날짜가 해당 활동 전이어야 함'},
+                            ]
+                        },
+                        {
+                            message: '포스터가 게시된 것을 찍은 사진인 경우',
+                            detail: [
+                                { message: '포스터가 모두 확인할 수 있는 곳에 붙어 있어야 함'},
+                                { message: '사진이 찍힌 날짜가 명백히 해당 활동 전이어야 함'}
+                            ]
+                        },
+                        { message: '포스터를 실물 제출했을 경우 - 집행부에서 확인 후 처리'}
+                    ]
+                }
+            ]
+        },
+        {
+            message: '내부 공지 자료',
+            detail: [
+                { message: '공지된 내용으로 동아리를 특정할 수 있어야 함'},
+                { message: '공지된 커뮤니티가 해당 동아리의 커뮤니티인지 확인할 수 있어야 함'},
+                {  
+                    message: '카카오톡 톡방 공지인 경우',
+
+                    detail: [
+                        { message: '등록 때 제출한 커뮤니티나 톡방인 경우, 등록 서류와 함께 제출했다고 기입하는 것으로 위 과정 대체 가능'},
+                        { message: '공지가 이루어진 일시를 확인할 수 있어야 함' }
+                    ]
+                },
+                { message: '등록 때 제출한 커뮤니티나 톡방인 경우, 등록 서류와 함께 제출했다고 기입하는 것으로 위 과정 대체 가능'}
+            ]
+        }
+    ]
+
     const addEvidence = () => {
         data.images.push({
             url:"https://cdn.pixabay.com/photo/2017/11/10/05/24/add-2935429_960_720.png",
@@ -66,7 +128,7 @@
         <table>
             <tr>
                 <th>활동명</th>
-                <td><Input bind:value={data.title} placeholder="" fullWidth /></td>
+                <td><Input bind:value={data.title} placeholder="활동명을 기입해주세요" fullWidth /></td>
             </tr>
             <tr>
                 <th>공식분류</th>
@@ -86,7 +148,7 @@
             </tr>
             <tr>
                 <th>장소</th>
-                <td><Input bind:value={data.location} placeholder="" fullWidth/></td>
+                <td><Input bind:value={data.location} placeholder="온라인으로 진행된 경우 온라인, 카카오톡 톡방 등 명확하게 기입해주세요" fullWidth/></td>
             </tr>
             <tr>
                 <th>참여회원수</th>
@@ -94,15 +156,15 @@
             </tr>
             <tr>
                 <th>참여 인원 (명단)</th>
-                <td><Input value={data.members.join(',')} placeholder="" fullWidth on:change={(e)=>fillMember(e.target.value)}/></td>
+                <td><Input value={data.members.join(',')} placeholder="참여 회원 이름을 모두 기입해주세요. (ex. 홍길동, 김동연) " fullWidth on:change={(e)=>fillMember(e.target.value)}/></td>
             </tr>
             <tr>
                 <th>활동 목적</th>
-                <td><Input bind:value={data.purpose} placeholder="" fullWidth multiline/></td>
+                <td><Input bind:value={data.purpose} placeholder="자세하고 정확하게 작성해주세요" fullWidth multiline/></td>
             </tr>
             <tr>
                 <th>활동 내용</th>
-                <td><Input bind:value={data.content} placeholder="" fullWidth multiline/></td>
+                <td><Input bind:value={data.content} placeholder="자세하고 정확하게 작성해주세요" fullWidth multiline/></td>
             </tr>
         </table>
     </div>
@@ -112,11 +174,45 @@
         <div class="info">
             활동 증빙 주의사항
             <ul>
-                <li>사진으로 해당 활동을 명확히 확인할 수 있어야 함</li>
-                <li>얼굴을 식별할 수 있는 경우만 사진에 나온 인원 수에 포함</li>
-                <li>외부인이 포함되어 있을 경우, 정회원을 표시해야 함 (명확히 구분할 수 있는 경우는 생략 가능)</li>
-                <li>활동 당시의 사진이어야 함</li>
-
+                {#each evidenceWarning as {message, detail: detail1}, idx}
+                <button
+                    class:foldable = {true}
+                    on:click={()=> {evidenceToggleId = evidenceToggleId == idx ? -1: idx}}
+                    class:unfold={evidenceToggleId == idx}
+                >
+                    <li>
+                        {message}
+                        {#if detail1}
+                        <ul>
+                            {#each detail1 as {message, detail: detail2}, idx}
+                            <li>
+                                {message}
+                                {#if detail2}
+                                <ul>
+                                    {#each detail2 as {message, detail: detail3}, idx}
+                                    <li>
+                                        {message}
+                                        {#if detail3}
+                                        <ul>
+                                            {#each detail3 as {message, detail: detail4}, idx}
+                                            <li>
+                                                {message}
+                                            </li>
+                                            {/each}
+                                        </ul>
+                                {/if}
+                                    </li>
+                                    {/each}
+                                </ul>
+                                {/if}
+                            </li>
+                            {/each}
+                        </ul>
+                        {/if}
+                    </li>
+                </button>
+                
+                {/each}
             </ul>
         </div>
         <div class="add-evidence">
@@ -255,5 +351,30 @@
     display: flex;
     justify-content: space-between;
     padding: 1rem;
+}
+ul {
+    padding-inline-start: 2rem;
+    list-style-type: decimal;
+}
+.foldable {
+    background-color: #0000;
+    width: 94%;
+    margin-bottom: 0.5rem;
+    display: block;
+    border: none;
+    text-align:start;
+    li{
+        margin-top: 0.5rem;
+    }
+    &.unfold {
+        ul {
+            display: block;
+        }
+    }
+    &:not(.unfold) {
+        ul {
+            display: none;
+        }
+    }
 }
 </style>
