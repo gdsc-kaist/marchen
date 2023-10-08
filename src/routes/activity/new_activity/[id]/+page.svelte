@@ -1,5 +1,8 @@
 <script lang="ts">
     import { Input, Button, Date as DatePicker, Select, Option } from "nunui";
+	import { onMount } from "svelte";
+
+    export let data;
 
     interface imageType {
         url: string,
@@ -27,18 +30,6 @@
     $: if (now) {
         data.date = now.toISOString().split('T')[0];
     };
-
-    const data:dataType = {
-        title: '',
-        classification: '합치하는 외부활동',
-        date:'',
-        location: '',
-        memberNum: 0,
-        members: [],
-        purpose: '',
-        content: '',
-        images: []
-    }
 
     let evidenceToggleId = -1;
 
@@ -237,7 +228,7 @@
     </div>
 </div>
 <div class="buttons">
-    <a href="./">
+    <a href="../">
         <Button outlined>이전</Button>
     </a>
     <Button on:click={()=>submit()}>보고서 제출하기</Button>
@@ -264,10 +255,10 @@
     table {
         border-spacing: 0;
         width: 100%;
-            border: 0.5px solid var(--primary-light3);
+            border: 0.5px solid var(--primary-light2);
         th, td {
             padding: 0.5rem 1rem;
-            border: 0.5px solid var(--primary-light3);
+            border: 0.5px solid var(--primary-light2);
         }
         th {
             background-color: var(--primary-light2);

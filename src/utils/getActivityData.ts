@@ -4,8 +4,7 @@ export async function getDataList() {
   try {
     const response = await fetch(dataDir); // 데이터 디렉토리 내의 파일 목록을 얻어옴
     const data = await response.json();
-    console.log(data);
-    return data.map(({id, title, classification, memberNum})=>(
+    return data.map(({id, title, classification, memberNum}:{id:string, title:string, classification:string, memberNum:number})=>(
         {id, title, classification, memberNum}
     ))
 
@@ -20,10 +19,11 @@ export async function getIdData(lookId:string) {
     try {
       const response = await fetch(dataDir); // 데이터 디렉토리 내의 파일 목록을 얻어옴
       const data = await response.json();
-      console.log(data);
-      return data.filter(({id}:{id:string})=>(
+      const filterData = data.filter(({id}:{id:string})=>(
           id == lookId
-      ))[0]
+      ));
+      if (filterData) return filterData[0];
+      else return null;
   
     } catch (error) {
       console.error('데이터 디렉토리를 읽는 중 오류 발생:', error);
