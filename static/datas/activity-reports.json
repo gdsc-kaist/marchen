@@ -1,0 +1,58 @@
+[{
+    "id": 1,
+    "title": "친목 활동",
+    "classification": "합치하지 않는 활동",
+    "date":"2023-09-20",
+    "location": "동아리방",
+    "memberNum": 5,
+    "members": ["이서현", "강우성", "류수현", "박도윤", "조유진"],
+    "purpose": "동아리 친목 강화",
+    "content": "FullStack 팀 5명이 모두 모여 친목조 활동을 하였습니다. 활동 증빙과 같이 밥을 먹고 보드게임을 진행하였습니다.",
+    "images": [
+        {
+            "url": "https://images.unsplash.com/photo-1548705085-101177834f47?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTV8fHRvZ2V0aGVyfGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60",
+            "desc": "활동 인원 전원이 나온 사진 입니다."
+        },
+        {
+            "url": "https://images.unsplash.com/photo-1585504198199-20277593b94f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1917&q=80",
+            "desc": "활동 중인 사진 입니다."
+        },
+        {
+            "url": "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+            "desc": "활동 중인 추가 사진 입니다"
+        }
+    ]
+},
+{
+    "id": 2,
+    "title": "동아리 연합회 전산화 개발",
+    "classification": "합치하는 내부 활동",
+    "date":"2023-09-20",
+    "location": "동아리방",
+    "memberNum": 5,
+    "members": ["이서현", "강우성", "류수현", "박도윤", "조유진"],
+    "purpose": "동아리 목적에 맞는 개발 프로젝트 진행",
+    "content": "FullStack 팀 5명이 모두 모여 동아리 연합회 전산화 개발을 하였습니다.",
+    "images": [
+        {
+            "url": "https://plus.unsplash.com/premium_photo-1683140655656-20448abc55da?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80"
+        }
+    ]
+},
+{
+    "id": 3,
+    "title": "동아리 연합회 전산화 개발 (2)",
+    "classification": "합치하는 내부 활동",
+    "date":"2023-09-20",
+    "location": "동아리방",
+    "memberNum": 4,
+    "members": ["이서현", "강우성", "류수현", "조유진"],
+    "purpose": "동아리 목적에 맞는 개발 프로젝트 진행",
+    "content": "FullStack 팀 5명이 모두 모여 동아리 연합회 전산화 개발을 하였습니다.",
+    "images": [
+        {
+            "url": "https://images.unsplash.com/photo-1587620962725-abab7fe55159?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1931&q=80"
+        }
+    ]
+}
+]
