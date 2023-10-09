@@ -4,8 +4,6 @@
 </script>
 
 <main class="main">
-	<Head title="물품 대여" size={200} img="https://i.imgur.com/ko0FTro.jpg" />
-
 	<h1>어떤 물품을 대여하고 싶으신가요?</h1>
 	<div class="thing-list">
 		<Card>

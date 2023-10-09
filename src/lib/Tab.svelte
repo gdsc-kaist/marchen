@@ -26,6 +26,9 @@
     border-radius: 12px;
     display: flex;
     overflow: hidden;
+    position: sticky;
+    top: 96px;
+    z-index: 1;
 
     & > a {
       padding: 16px;

@@ -4,7 +4,7 @@ import {tick} from "svelte";
 import {get_current_component} from "svelte/internal";
 
 
-export const staticUrl = 'https://s.kaist.io'
+export const staticUrl = 'https://s.jungol.co.kr'
 export const endpoint = import.meta.env.DEV ? 'http://localhost:2023' : (import.meta.env.VITE_BETA ? 'https://oz-beta.marchen.kaist.io' : 'https://oz.marchen.kaist.io')
 
 export default function api(path: string, data: any = undefined, method = 'POST') {
