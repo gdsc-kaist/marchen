@@ -7,9 +7,6 @@
     export let data;
 </script>
 
-<Head title="경고/상세"
-      img="https://images.unsplash.com/photo-1602913238167-3a810817d62a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2946&q=80"/>
-
 <Provider penalty={data.id} let:data>
     <Grid col="2">
         <DataCard icon="group" title="동아리" href="/circle/{data.circle}" data={{circle: data.circle}}/>
